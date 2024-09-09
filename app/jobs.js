@@ -16,8 +16,9 @@ export default function Index() {
   const [jobName, setJobName] = useState('');
   const [jobAddress, setJobAddress] = useState('');
   const [jobPrice, setJobPrice] = useState(0);
-  const [customerDetails, setCustomerDetails] = useState({name:null,email:null,phone:null});
-  const [workers,setworkers] = useState([]);
+
+  const [customers,setCustomers] = useState([]);
+  const [selectCustomer,setSelectCustomer] = useState(false);
 
 
   useEffect(() => {
@@ -38,22 +39,39 @@ export default function Index() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   console.log('selected effect', selectedJob);
-  // }, [selectedJob]);
+  useEffect(() => {
+   if(selectCustomer){
+    console.log('selectCustomer',selectCustomer);
+    AsyncStorage.getItem('customers')
+    .then((data)=>{
+      setCustomers(JSON.parse(data));
+    })
+   }
+  }, [selectCustomer]);
 
   const addJob = () => {
     console.log(newJob);
+    if(newJob.name.length===0){
+      Alert.alert('Error','Job name must not be empty');
+      return;
+    }
+
+    if(newJob.address.length===0){
+      Alert.alert('Error','Wheres this job at then? It must have an address...');
+      return;
+    }
+
     if (jobs.find((job) => job.jobName === newJob.jobName)) {
       Alert.alert('Error', 'Job name already exists');
       return;
     }
-    if (newJob.jobPrice <= 0) {
-      Alert.alert('Error', 'Rate must be greater than 0');
+
+    if (newJob.price <= 0 || isNaN(newJob.jobPrice)) {
+      Alert.alert('Error', 'No love jobs allowed! price must be greater than 0');
       return;
     }
 
-    const updatedJobs = [JSON.parse(JSON.stringify(jobs)), newJob];
+    const updatedJobs = [...JSON.parse(JSON.stringify(jobs)), newJob];
     setJobs(updatedJobs);
     AsyncStorage.setItem('jobs', JSON.stringify(updatedJobs));
     setNewJob(null);
@@ -61,18 +79,18 @@ export default function Index() {
 
   const editJob = () => {
     console.log(editedJob);
-    if (editedJob.jobPrice <= 0 || isNaN(editedJob.jobPrice)) {
+    if (editedJob.price <= 0 || isNaN(editedJob.price)) {
       Alert.alert('Error', 'Job cannot be free');
       return;
     }
-    if (editedJob.jobName.length === 0) {
+    if (editedJob.name.length === 0) {
       Alert.alert('Error', 'Job name must not be empty');
       return;
     }
 
     Alert.alert(
       "Edit Job",
-      `Are you sure you want to edit ${selectedJob.jobName}?`,
+      `Are you sure you want to edit ${selectedJob.name}?`,
       [
         {
           text: "Cancel",
@@ -84,7 +102,7 @@ export default function Index() {
           text: "YES!!",
           onPress: () => {
             const index = jobs.findIndex(
-              (job) => job.jobName === selectedJob.jobName
+              (job) => job.name === selectedJob.name
             );
             const newJobs = JSON.parse(JSON.stringify(jobs));
             newJobs[index] = editedJob;
@@ -101,7 +119,7 @@ export default function Index() {
 
   const handleDelete = () => {
     if (selectedJob) {
-      Alert.alert('Delete Job', `Are you sure you want to delete ${selectedJob.jobName}?`, [
+      Alert.alert('Delete Job', `Are you sure you want to delete ${selectedJob.name}?`, [
         {
           text: 'Cancel',
           onPress: () => {
@@ -114,10 +132,10 @@ export default function Index() {
             console.log('deleting job');
 
             setJobs((jobs) => {
-              const newJobs = jobs.filter((job) => job.jobName !== selectedJob.jobName);
-              AsyncStorage.setItem('jobs', JSON.stringify(newJobs)); // Update AsyncStorage
+              const newJobs = jobs.filter((job) => job.name !== selectedJob.name);
               return newJobs;
             });
+            AsyncStorage.setItem('jobs', JSON.stringify(jobs)); // Update AsyncStorage
 
             setSelectedJob(null);
           },
@@ -134,7 +152,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       {/* JOB LIST  */}
-      {!selectedJob && !newJob && (
+      {!selectedJob && !newJob && !selectCustomer &&(
         <View
           style={{
             ...styles.jobList,
@@ -152,8 +170,8 @@ export default function Index() {
                       changeSelectedJob(job);
                     }}
                   >
-                    <Text style={styles.listItem}>{job.customerDetails.name}</Text>
-                    <Text style={styles.listItem}>{job.jobName}</Text>
+                    <Text style={styles.listItem}>{job.name}</Text>
+                  
                 
                   </Pressable>
             )}) : 
@@ -164,24 +182,24 @@ export default function Index() {
       )}
 
       {/*  EDIT JOB  */}
-      {selectedJob && (
+      {selectedJob && (<>
         <ScrollView style={styles.jobDetails}>
           <Text style={styles.header}>Job Details</Text>
           <View style={styles.item}>
-            <Text style={styles.itemDetails}>Job name: {selectedJob.jobName}</Text>
+            <Text style={styles.itemDetails}>Job name: {selectedJob.name}</Text>
             <TextInput
               style={styles.textInput}
               placeholder="New job name"
               onChange={(e) => {
                 setEditedJob({
                   ...selectedJob,
-                  jobName: e.nativeEvent.text,
+                  name: e.nativeEvent.text,
                 });
               }}
             />
           </View>
           <View style={styles.item}>
-            <Text style={styles.itemDetails}>Price: £{selectedJob.jobPrice}</Text>
+            <Text style={styles.itemDetails}>Quoted Price: £{selectedJob.price}</Text>
             <TextInput
               style={styles.textInput}
               keyboardType="numeric"
@@ -189,16 +207,14 @@ export default function Index() {
               onChange={(e) => {
                 setEditedJob({
                   ...selectedJob,
-                  jobPrice: e.nativeEvent.text,
+                  price: e.nativeEvent.text,
                 });
               }}
             />
           </View>
-          <View style={styles.bottom}>
-            <Button color="red" title="Delete" onPress={handleDelete} />
-          </View>
 
-          <View style={{ ...styles.buttons, flex: 0.8 }}>
+            </ScrollView>
+          <View style={{ ...styles.buttons}}>
             {editedJob && <Button title="Save" onPress={editJob} />}
 
             <Button
@@ -209,20 +225,36 @@ export default function Index() {
               }}
             />
           </View>
-        </ScrollView>
+          <View style={styles.bottom}>
+            <Button color="red" title="Delete" onPress={handleDelete} />
+          </View>
+          </>
       )}
 
       {/*  ADD JOB  */}
-      {newJob && (
+      {newJob && !selectCustomer &&(
         <ScrollView style={styles.jobDetails}>
           <Text style={styles.header}>Add Job</Text>
-
+            {newJob.customer?
+            <View style={styles.item}>
+              <Text style={styles.itemDetails}>
+              Customer: {newJob.customer}
+              </Text>
+              </View>
+            :
+            <View style={styles.item}>
+            <Button color='green' title="Add Customer" onPress={()=>{setSelectCustomer(true)}}/>
+            </View>
+            }
+          {newJob.customer &&
+          <>
+         
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Job name: </Text>
             <TextInput
               style={styles.textInput}
               placeholder="Job name"
-              onChange={(e) => {setJobName(e.nativeEvent.text)}}
+              onChange={(e) => {setNewJob({...newJob,name:e.nativeEvent.text})}}
             />
           </View>
 
@@ -231,43 +263,23 @@ export default function Index() {
             <TextInput
               style={styles.textInput}
               placeholder="Job address"
-              onChange={(e) => {setJobAddress(e.nativeEvent.text)}}
+              onChange={(e) => {setNewJob({...newJob,address:e.nativeEvent.text})}}
             />
           </View>
 
-          <Text style={styles.itemDetails}>Customer Details</Text>
-            <View style={styles.item}>
-              <Text style={styles.itemDetails}>Name: </Text>
-              <TextInput
-                style={styles.textInput}
-               
-                placeholder="Customer name"
-                onChange={(event) => {
-                  event.persist();
-                  setCustomerDetails((details)=>{
-                  return {...details,name:event.nativeEvent.text}
-                })}}
-              />
-            </View>
 
-            <View style={styles.item}>
-              <Text style={styles.itemDetails}>Address: </Text>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Customer address"
-                onChange={(e) => {setJobPrice(e.nativeEvent.text)}}
-              />
-            </View>
           <View style={styles.item}>
-            <Text style={styles.itemDetails}>Price: </Text>
+            <Text style={styles.itemDetails}>Quoted Price: </Text>
             <TextInput
               style={styles.textInput}
               keyboardType="numeric"
-              placeholder="Price"
-              onChange={(e) => {setJobPrice(e.nativeEvent.text)}}
+              placeholder="Quoted price"
+              onChange={(e) => {setNewJob({...newJob,price:e.nativeEvent.text})}}
             />
           </View>
           <Button title="Save" onPress={addJob} />
+          </>
+}
           <View style={styles.bottom}>
             <Button
               title="Back"
@@ -279,8 +291,42 @@ export default function Index() {
         </ScrollView>
       )}
 
+      {/*  SELECT CUSTOMER  */}
+      {selectCustomer &&(
+        <>
+          <Text style={styles.header}>Select Customer</Text>
+         <ScrollView style={styles.jobList}>
+            {customers.length > 0 && 
+              customers.map((customer, index) => {
+                return (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      setNewJob({...newJob,customer:customer.name});
+                      setSelectCustomer(false);
+                    }}
+                  >
+                    <Text style={styles.listItem}>{customer.name}</Text>
+                   
+                  </Pressable>
+            )})
+            }
+          </ScrollView>
+        
+          <View style={styles.bottom}>
+            <Button
+              title="Back"
+              onPress={() => {
+                setSelectCustomer(false);
+              }}
+            />
+         
+         </View>
+         </>
+      )}
+
       {/*  NAV BUTTONS  */}
-      {!selectedJob && !newJob && (
+      {!selectedJob && !newJob && !selectCustomer &&(
         <View style={styles.buttons}>
           <Button
             title="Add Job"
@@ -353,6 +399,7 @@ const styles = StyleSheet.create({
   item: {
    justifyContent: 'space-between',
     flexDirection: 'column',
+    marginBottom:10,
     width: '100%',
   },
   itemDetails: {
@@ -364,7 +411,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
     borderRadius: 5,
-   
+   paddingLeft:10,
     width: '100%',
     height: 30,
    
