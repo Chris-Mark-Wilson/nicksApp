@@ -10,7 +10,7 @@ export default function Index() {
   const [workers,setWorkers] = useState([]);
 
   const [selectedWorker, setSelectedWorker] = useState(null);
-  const [editedWorker, setEditedWorker] = useState({});
+  const [editedWorker, setEditedWorker] = useState(null);
   const [newWorker, setNewWorker] = useState(null);
 
   useEffect(()=>{
@@ -57,7 +57,16 @@ export default function Index() {
 
 
   const editWorker = () => {
-    console.log('edit worker');
+  console.log(editedWorker);
+    if(editedWorker.rate<=0 || isNaN(editedWorker.rate)){
+      Alert.alert('Error','Rate must be greater than 0');
+      return
+    }
+    if(editedWorker.name.length===0){
+      Alert.alert('Error','Name must not be empty');
+      return
+    }
+
     Alert.alert('Edit Worker', `Are you sure you want to edit ${selectedWorker.name}?`, [
       {
         text: 'Cancel',
@@ -114,82 +123,134 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <View style={{ ...styles.workerList, flex: selectedWorker || newWorker ? 0.1 : 0.6 }}>
-        <ScrollView>
-          <Text style={styles.header}>Workers</Text>
-          {workers.length>0 && workers.map((worker, index) => {
-            return (
-              <Pressable
-                key={index}
-                onPress={()=>{changeSelectedWorker(worker)}}
-                
-              >
-                <Text style={styles.listItem}>
-                  {worker.name} - £{worker.rate}/day
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
+      {/* WORKER LIST  */}
+      {!selectedWorker && !newWorker && (
+        <View
+          style={{
+            ...styles.workerList,
+            display: selectedWorker || newWorker ? "none" : "flex",
+          }}
+        >
+          <ScrollView>
+            <Text style={styles.header}>Workers</Text>
+            {workers.length > 0 ? (
+              workers.map((worker, index) => {
+                return (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      changeSelectedWorker(worker);
+                    }}
+                  >
+                    <Text style={styles.listItem}>
+                      {worker.name} - £{worker.rate}/day
+                    </Text>
+                  </Pressable>
+                );
+              })
+            ) : (
+              <Text>No workers</Text>
+            )}
+          </ScrollView>
+        </View>
+      )}
 
-
+      {/*  EDIT WORKER  */}
       {selectedWorker && (
         <SafeAreaView style={styles.workerDetails}>
           <Text style={styles.header}>Worker Details</Text>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Name: {selectedWorker.name}</Text>
-            <TextInput style={styles.textInput}   placeholder="New name" onChange={(e)=>{ setEditedWorker({...selectedWorker, name: e.nativeEvent.text});}} />
+            <TextInput
+              style={styles.textInput}
+              placeholder="New name"
+              onChange={(e) => {
+                setEditedWorker({
+                  ...selectedWorker,
+                  name: e.nativeEvent.text,
+                });
+              }}
+            />
           </View>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>
               Rate: £{selectedWorker.rate}/day
             </Text>
-            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="New rate" onChange={(e)=>{   setEditedWorker({...selectedWorker, rate: e.nativeEvent.text});}} />
+            <TextInput
+              style={styles.textInput}
+              keyboardType="numeric"
+              placeholder="New rate"
+              onChange={(e) => {
+                setEditedWorker({
+                  ...selectedWorker,
+                  rate: e.nativeEvent.text,
+                });
+              }}
+            />
           </View>
           <View style={styles.bottom}>
-          <Button color='red' title="Delete" onPress={handleDelete} />
+            <Button color="red" title="Delete" onPress={handleDelete} />
           </View>
 
+          <View style={{ ...styles.buttons, flex: 0.8 }}>
+            {editedWorker && <Button title="Save" onPress={editWorker} />}
+
             <Button
-              title=
-              {(editedWorker.name||editedWorker.rate)?"Save":"Back"}
-              onPress={editedWorker?editWorker:setSelectedWorker(null)}
+              title="Back"
+              onPress={() => {
+                setEditedWorker(null);
+                setSelectedWorker(null);
+              }}
             />
+          </View>
         </SafeAreaView>
       )}
 
-
+      {/*  ADD WORKER  */}
       {newWorker && (
         <SafeAreaView style={styles.workerDetails}>
           <Text style={styles.header}>Add Worker</Text>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Name: </Text>
-            <TextInput style={styles.textInput}   placeholder="Name" 
-            onChange={(e)=>{setNewWorker({...newWorker,name:e.nativeEvent.text}
-            )}} />
+            <TextInput
+              style={styles.textInput}
+              placeholder="Name"
+              onChange={(e) => {
+                setNewWorker({ ...newWorker, name: e.nativeEvent.text });
+              }}
+            />
           </View>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Rate: </Text>
-            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="Rate" 
-            onChange={(e)=>{setNewWorker({...newWorker,rate:e.nativeEvent.text}
-            )}} />
-          </View>
-            <Button
-              title="Save"
-              onPress={addWorker}
+            <TextInput
+              style={styles.textInput}
+              keyboardType="numeric"
+              placeholder="Rate"
+              onChange={(e) => {
+                setNewWorker({ ...newWorker, rate: e.nativeEvent.text });
+              }}
             />
+          </View>
+          <Button title="Save" onPress={addWorker} />
           <View style={styles.bottom}>
-            <Button title='Back' onPress={()=>{setNewWorker(null)}} />
+            <Button
+              title="Back"
+              onPress={() => {
+                setNewWorker(null);
+              }}
+            />
           </View>
         </SafeAreaView>
       )}
 
-      {!selectedWorker && !newWorker &&(
+      {/*  NAV BUTTONS  */}
+      {!selectedWorker && !newWorker && (
         <View style={styles.buttons}>
           <Button
             title="Add worker"
-            onPress={()=>{setNewWorker({name:'',rate:0})}}
+            onPress={() => {
+              setNewWorker({ name: "", rate: 0 });
+            }}
           />
           <Button
             title="Home"
@@ -247,6 +308,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     flex:0.7,
     width:'80%',
+    alignItems:'center',
     backgroundColor: "lightblue",
   },
   buttons: {
