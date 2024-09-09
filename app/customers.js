@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View,ScrollView,TextInput,SafeAreaView,Alert } from 'react-native';
+import { Button, StyleSheet, Text, View,ScrollView,TextInput,SafeAreaView,KeyboardAvoidingView ,Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Pressable} from 'react-native';
 import { useState,useEffect } from 'react';
@@ -7,67 +7,94 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
   const navigation = useNavigation();
-  const [workers,setWorkers] = useState([]);
+  const [customers,setCustomers] = useState([]);
 
-  const [selectedWorker, setSelectedWorker] = useState(null);
-  const [editedWorker, setEditedWorker] = useState(null);
-  const [newWorker, setNewWorker] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [editedCustomer, setEditedCustomer] = useState(null);
+  const [newCustomer, setNewCustomer] = useState(null);
+  const keyboardOffset=200;
 
   useEffect(()=>{
   console.log('fired effect');
-    const getWorkers = async () => {
+    const getCustomers = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem('workers');
+        const jsonValue = await AsyncStorage.getItem('customers');
         return jsonValue != null ? JSON.parse(jsonValue) : [];
       } catch(e) {
         console.log('error reading value');
       }
     }
 
-  if(workers.length===0){
-    getWorkers()
+  if(customers.length===0){
+    getCustomers()
     .then((data)=>{
-      setWorkers(data);
+      setCustomers(data);
     })
   }
   
   },[]);
 
   useEffect(()=>{
-    console.log('selected effect',selectedWorker);
-  },[selectedWorker])
+    console.log('selected effect',selectedCustomer);
+  },[selectedCustomer])
 
 
 
-  const addWorker = () => {
-   if(workers.find((worker)=>worker.name===newWorker.name)){
-     Alert.alert('Error','Worker already exists');
+  const addCustomer = () => {
+if(newCustomer.name===''){
+  Alert.alert('Error','Customer must have a name');
+  return;
+  }
+
+   if(customers.find((customer)=>customer.name===newCustomer.name)){
+     Alert.alert('Error','Customer already exists');
      return;
     }
-    if(newWorker.rate<=0){
-      Alert.alert('Error','Rate must be greater than 0');
+    if(newCustomer.email==='' && newCustomer.tel===''){
+      Alert.alert('Error','Customer must have contact details, either email or telephone');
       return;
     }
 
-    setWorkers([...workers,newWorker]);
-    AsyncStorage.setItem('workers',JSON.stringify([...workers,newWorker]));
-    setNewWorker(null);
+    //validate email
+    if(newCustomer.email){
+      const email=newCustomer.email;
+      const emailPattern=/\S+@\S+\.\S+/;
+      if(!emailPattern.test(email)){
+        Alert.alert('Error','Invalid email address');
+        return;
+      }
+    }
+
+    setCustomers([...customers,newCustomer]);
+    AsyncStorage.setItem('customers',JSON.stringify([...customers,newCustomer]));
+    setNewCustomer(null);
   }
 
 
 
-  const editWorker = () => {
-  console.log(editedWorker);
-    if(editedWorker.rate<=0 || isNaN(editedWorker.rate)){
-      Alert.alert('Error','Rate must be greater than 0');
-      return
-    }
-    if(editedWorker.name.length===0){
-      Alert.alert('Error','Name must not be empty');
-      return
-    }
-
-    Alert.alert('Edit Worker', `Are you sure you want to edit ${selectedWorker.name}?`, [
+  const editCustomer = () => {
+    console.log('editedCustomer',editedCustomer);
+  if(editedCustomer.name===''){
+  Alert.alert('Error','Customer must have a name');
+  return;
+  }
+  
+     if(editedCustomer.email==='' && editedCustomer.tel===''){
+       Alert.alert('Error','Customer must have contact details, either email or telephone');
+       return;
+     }
+ 
+     //validate email
+     if(editedCustomer.email!==selectedCustomer.email){
+      console.log('found email validating');
+       const email=editedCustomer.email;
+       const emailPattern=/\S+@\S+\.\S+/;
+       if(!emailPattern.test(email)){
+         Alert.alert('Error','Invalid email address');
+         return;
+       }
+     }
+    Alert.alert('Edit Customer', `Are you sure you want to edit ${selectedCustomer.name}?`, [
       {
         text: 'Cancel',
         onPress: () => {
@@ -78,23 +105,23 @@ export default function Index() {
         text: 'YES!!',
         onPress: () => {
         
-          setWorkers((workers)=>{
-            const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
-            const index=workers.indexOf(oldworker);
-            workers[index]=editedWorker;
-            return workers;
+          setCustomers((customers)=>{
+            const oldcustomer=customers.find((customer)=>customer.name===selectedCustomer.name);
+            const index=customers.indexOf(oldcustomer);
+            customers[index]=editedCustomer;
+            return customers;
           });
-          AsyncStorage.setItem('workers',JSON.stringify(workers));
-          setSelectedWorker(null);
-          setEditedWorker({});
+          AsyncStorage.setItem('customers',JSON.stringify(customers));
+          setSelectedCustomer(null);
+          setEditedCustomer({});
         },
       },
     ]);
   }
 
   const handleDelete=()=>{
-    if(selectedWorker){
-      Alert.alert('Delete Worker', `Are you sure you want to delete ${selectedWorker.name}?`, [
+    if(selectedCustomer){
+      Alert.alert('Delete Customer', `Are you sure you want to delete ${selectedCustomer.name}?`, [
         {
           text: 'Cancel',
           onPress: () => {
@@ -104,152 +131,210 @@ export default function Index() {
         {
           text: 'YES!!',
           onPress: () => {
-            console.log('deleting worker');
-            const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
-            const index=workers.indexOf(oldworker);
-            workers.splice(index,1);
-            setWorkers([...workers]);
-            AsyncStorage.setItem('workers',JSON.stringify([...workers]));
-            setSelectedWorker(null);
+            console.log('deleting customer');
+            const oldcustomer=customers.find((customer)=>customer.name===selectedCustomer.name);
+            const index=customers.indexOf(oldcustomer);
+            customers.splice(index,1);
+            setCustomers([...customers]);
+            AsyncStorage.setItem('customers',JSON.stringify([...customers]));
+            setSelectedCustomer(null);
           },
         },
       ]);
     }
   }
-  const changeSelectedWorker = (worker) => {
-    console.log('changeSelectedWorker',worker);
-    setSelectedWorker(worker);
+  const changeSelectedCustomer = (customer) => {
+    console.log('changeSelectedCustomer',customer);
+    setSelectedCustomer(customer);
   }
 
   return (
     <View style={styles.container}>
-      {/* WORKER LIST  */}
-      {!selectedWorker && !newWorker && (
+      {/* CUSTOMER LIST  */}
+      {!selectedCustomer && !newCustomer && (
         <View
           style={{
-            ...styles.workerList,
-            display: selectedWorker || newWorker ? "none" : "flex",
+            ...styles.customerList, 
+            display: selectedCustomer || newCustomer ? "none" : "flex",
           }}
         >
+        
           <ScrollView>
+            
             <Text style={styles.header}>Customers</Text>
-            {workers.length > 0 ? (
-              workers.map((worker, index) => {
+            {customers.length > 0 ? (
+              customers.map((customer, index) => {
                 return (
                   <Pressable
                     key={index}
                     onPress={() => {
-                      changeSelectedWorker(worker);
+                      changeSelectedCustomer(customer);
                     }}
                   >
                     <Text style={styles.listItem}>
-                      {worker.name} - £{worker.rate}/day
+                      {customer.name} 
                     </Text>
                   </Pressable>
                 );
               })
             ) : (
-              <Text>No workers</Text>
+              <Text>No customers</Text>
             )}
           </ScrollView>
         </View>
       )}
 
-      {/*  EDIT WORKER  */}
-      {selectedWorker && (
-        <SafeAreaView style={styles.workerDetails}>
-          <Text style={styles.header}>Worker Details</Text>
-          <View style={styles.item}>
-            <Text style={styles.itemDetails}>Name: {selectedWorker.name}</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="New name"
-              onChange={(e) => {
-                setEditedWorker({
-                  ...selectedWorker,
-                  name: e.nativeEvent.text,
-                });
-              }}
-            />
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.itemDetails}>
-              Rate: £{selectedWorker.rate}/day
-            </Text>
-            <TextInput
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder="New rate"
-              onChange={(e) => {
-                setEditedWorker({
-                  ...selectedWorker,
-                  rate: e.nativeEvent.text,
-                });
-              }}
-            />
-          </View>
+      {/*  EDIT CUSTOMER  */}
+      {selectedCustomer && (
+      <ScrollView style={styles.customerDetails}>
+     
+     
+      <Text style={styles.header}>Edit Customer</Text>
+      <View style={styles.item}>
+        <Text style={styles.itemDetails}>Name: {selectedCustomer.name}</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="New customer name"
+          onChange={(e) => {
+            setEditedCustomer({ ...selectedCustomer, name: e.nativeEvent.text });
+          }}
+        />
+      </View>
+
+      <View style={styles.item}>
+        <Text style={styles.itemDetails}>Address: {selectedCustomer.address??'none given'}</Text>
+        <TextInput
+          style={styles.textInput}
+        
+          placeholder="New customer address"
+          onChange={(e) => {
+            setEditedCustomer({ ...selectedCustomer, address: e.nativeEvent.text });
+          }}
+        />
+      </View>
+
+      <View style={styles.item}>
+        <Text style={styles.itemDetails}>Email: {selectedCustomer.email??'none given'}</Text>
+        <TextInput
+          style={styles.textInput}
+         
+          placeholder="New customer email"
+          onChange={(e) => {
+            console.log('email',e.nativeEvent.text);
+            setEditedCustomer({ ...selectedCustomer, email: e.nativeEvent.text.toLowerCase() });
+          }}
+        />
+      </View>
+
+       <View style={styles.item}>
+        <Text style={styles.itemDetails}>Telephone: {selectedCustomer.tel??'none given'}</Text>
+        <TextInput
+          style={styles.textInput}
+          keyboardType='numeric'
+          placeholder="New customer telephone"
+          onChange={(e) => {
+            setEditedCustomer({ ...selectedCustomer, tel: e.nativeEvent.text });
+          }}
+        />
+      </View>
+
+          <View style={styles.buttons}>
+            {editedCustomer && 
+            <View style={styles.button}>
+            <Button title="Save" onPress={editCustomer} />
+            
+            </View>
+            }
+              <View style={styles.button}>
+                <Button
+                  title="Back"
+                  onPress={() => {
+                    setEditedCustomer(null);
+                    setSelectedCustomer(null);
+                  }}
+                />
+              </View>
+            </View>
+
           <View style={styles.bottom}>
-            <Button color="red" title="Delete" onPress={handleDelete} />
+            <Button color="red" title="Delete Customer" onPress={handleDelete} />
           </View>
 
-          <View style={{ ...styles.buttons, flex: 0.8 }}>
-            {editedWorker && <Button title="Save" onPress={editWorker} />}
-
-            <Button
-              title="Back"
-              onPress={() => {
-                setEditedWorker(null);
-                setSelectedWorker(null);
-              }}
-            />
-          </View>
-        </SafeAreaView>
+        </ScrollView >
       )}
 
-      {/*  ADD WORKER  */}
-      {newWorker && (
-        <SafeAreaView style={styles.workerDetails}>
-          <Text style={styles.header}>Add Worker</Text>
+      {/*  ADD CUSTOMER  */}
+      {newCustomer && (
+        <ScrollView style={styles.customerDetails}>
+     
+          <Text style={styles.header}>Add Customer</Text>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Name: </Text>
             <TextInput
               style={styles.textInput}
-              placeholder="Name"
+              placeholder="Customer name"
               onChange={(e) => {
-                setNewWorker({ ...newWorker, name: e.nativeEvent.text });
+                setNewCustomer({ ...newCustomer, name: e.nativeEvent.text });
               }}
             />
           </View>
+
           <View style={styles.item}>
-            <Text style={styles.itemDetails}>Rate: </Text>
+            <Text style={styles.itemDetails}>Address: </Text>
             <TextInput
               style={styles.textInput}
-              keyboardType="numeric"
-              placeholder="Rate"
+            
+              placeholder="Customer address"
               onChange={(e) => {
-                setNewWorker({ ...newWorker, rate: e.nativeEvent.text });
+                setNewCustomer({ ...newCustomer, address: e.nativeEvent.text });
               }}
             />
           </View>
-          <Button title="Save" onPress={addWorker} />
+
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>Email: </Text>
+            <TextInput
+              style={styles.textInput}
+            
+              placeholder="Customer email"
+              onChange={(e) => {
+                setNewCustomer({ ...newCustomer, email: e.nativeEvent.text.toLowerCase() });
+              }}
+            />
+          </View>
+
+           <View style={styles.item}>
+            <Text style={styles.itemDetails}>Telephone: </Text>
+            <TextInput
+              style={styles.textInput}
+              keyboardType='numeric'
+              placeholder="Customer telephone"
+              onChange={(e) => {
+                setNewCustomer({ ...newCustomer, tel: e.nativeEvent.text });
+              }}
+            />
+          </View>
+
+          <Button title="Save" onPress={addCustomer} />
           <View style={styles.bottom}>
             <Button
               title="Back"
               onPress={() => {
-                setNewWorker(null);
+                setNewCustomer(null);
               }}
             />
           </View>
-        </SafeAreaView>
+          
+        </ScrollView >
       )}
 
       {/*  NAV BUTTONS  */}
-      {!selectedWorker && !newWorker && (
+      {!selectedCustomer && !newCustomer && (
         <View style={styles.buttons}>
           <Button
-            title="Add worker"
+            title="Add customer"
             onPress={() => {
-              setNewWorker({ name: "", rate: 0 });
+              setNewCustomer({ name: "", rate: 0 });
             }}
           />
           <Button
@@ -281,16 +366,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "blue",
   },
-  workerList: {
+  customerList: {
     borderColor: "red",
     borderWidth: 5,
-    flex: 0.4,
+    flex: 1,
     backgroundColor: "lightblue",
 
     padding: 20,
 
     // overflow: 'scroll',
-    width: "80%",
+    width: "100%",
   },
   listItem: {
     borderColor: "orange",
@@ -303,12 +388,13 @@ const styles = StyleSheet.create({
     color: "black",
     // textTransform: 'uppercase',
   },
-  workerDetails:{
+  customerDetails:{
     borderColor: "blue",
     borderWidth: 2,
-    flex:0.7,
-    width:'80%',
-    alignItems:'center',
+    flex:1,
+  padding:10,
+    width:'100%',
+    // alignItems:'center',
     backgroundColor: "lightblue",
   },
   buttons: {
@@ -319,13 +405,19 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: "space-around",
 
-    width: "80%",
+    width: "100%",
+  },
+  button: {
+    margin:10,
   },
   item:{
-    flexDirection:'row',
+     justifyContent: 'space-between',
+    flexDirection: 'column',
+    width: '100%',
+    marginTop:10,
+    marginBottom:10,
   },
   itemDetails:{
-    margin:10,
     fontSize: 18,
     color: "black",
   
@@ -334,15 +426,12 @@ const styles = StyleSheet.create({
     borderColor:'black',
     borderWidth:1,
     borderRadius:5,
-    paddingTop:0,
     paddingLeft:5,
-    width:100,
+    width:'100%',
     height:30,
-    margin:10,
+
   },
   bottom:{
-    position:'absolute',
-    width:'100%',
-    bottom:20,
+margin:20
   }
 });

@@ -41,7 +41,7 @@ export default function Index() {
 
         <BigButton color="blue" title="Workers" nav="workers" />
 
-        <BigButton color="purple" title="Invoices" nav="invoices" />
+        <BigButton color="purple" title="Payday" nav="payday" />
 
         <Button color="red" title="RESET DATABASE" onPress={handleReset} />
         <StatusBar style="auto" />
