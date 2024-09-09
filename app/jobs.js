@@ -165,7 +165,7 @@ export default function Index() {
 
       {/*  EDIT JOB  */}
       {selectedJob && (
-        <SafeAreaView style={styles.jobDetails}>
+        <ScrollView style={styles.jobDetails}>
           <Text style={styles.header}>Job Details</Text>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Job name: {selectedJob.jobName}</Text>
@@ -209,12 +209,12 @@ export default function Index() {
               }}
             />
           </View>
-        </SafeAreaView>
+        </ScrollView>
       )}
 
       {/*  ADD JOB  */}
       {newJob && (
-        <SafeAreaView style={styles.jobDetails}>
+        <ScrollView style={styles.jobDetails}>
           <Text style={styles.header}>Add Job</Text>
 
           <View style={styles.item}>
@@ -276,7 +276,7 @@ export default function Index() {
               }}
             />
           </View>
-        </SafeAreaView>
+        </ScrollView>
       )}
 
       {/*  NAV BUTTONS  */}
@@ -318,10 +318,10 @@ const styles = StyleSheet.create({
   jobList: {
     borderColor: 'red',
     borderWidth: 5,
-    flex: 0.4,
+    flex: 1,
     backgroundColor: 'lightblue',
     padding: 20,
-    width: '80%',
+    width: '100%',
   },
   listItem: {
     borderColor: 'orange',
@@ -337,8 +337,8 @@ const styles = StyleSheet.create({
     borderColor: 'blue',
     borderWidth: 2,
     flex: 1,
-    width: '80%',
-    alignItems: 'center',
+    padding:10,
+    width: '100%',
     backgroundColor: 'lightblue',
   },
   buttons: {
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgreen',
     padding: 10,
     justifyContent: 'space-around',
-    width: '80%',
+    width: '100%',
   },
   item: {
    justifyContent: 'space-between',
@@ -370,8 +370,6 @@ const styles = StyleSheet.create({
    
   },
   bottom: {
-    position: 'absolute',
-    width: '100%',
-    bottom: 20,
+  margin:20
   },
 });

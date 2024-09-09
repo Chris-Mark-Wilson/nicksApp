@@ -284,13 +284,10 @@ const styles = StyleSheet.create({
   workerList: {
     borderColor: "red",
     borderWidth: 5,
-    flex: 0.4,
+    flex: 1,
     backgroundColor: "lightblue",
-
-    padding: 20,
-
-    // overflow: 'scroll',
-    width: "80%",
+    padding: 10,
+    width: "100%",
   },
   listItem: {
     borderColor: "orange",
@@ -306,9 +303,9 @@ const styles = StyleSheet.create({
   workerDetails:{
     borderColor: "blue",
     borderWidth: 2,
-    flex:0.7,
-    width:'80%',
-    alignItems:'center',
+    flex:1,
+    width:'100%',
+  
     backgroundColor: "lightblue",
   },
   buttons: {
@@ -319,7 +316,7 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: "space-around",
 
-    width: "80%",
+    width: "100%",
   },
   item:{
     flexDirection:'row',
