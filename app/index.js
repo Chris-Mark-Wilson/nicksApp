@@ -37,7 +37,11 @@ export default function Index() {
         <Text style={styles.header} > INDEX </Text>
         <BigButton color="green" title="Jobs" nav="jobs" />
 
+        <BigButton color="orange" title="Customers" nav="customers" />
+
         <BigButton color="blue" title="Workers" nav="workers" />
+
+        <BigButton color="purple" title="Invoices" nav="invoices" />
 
         <Button color="red" title="RESET DATABASE" onPress={handleReset} />
         <StatusBar style="auto" />

@@ -1,5 +1,4 @@
 {
-  
   "expo": {
     "scheme": "https",
     "name": "nicksApp",
@@ -20,13 +19,22 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.chrismark_wilson.nicksApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "31bc50bb-8a08-432c-a948-4a7293211758"
+      }
+    }
   }
 }
