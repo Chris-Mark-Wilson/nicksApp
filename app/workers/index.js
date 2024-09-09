@@ -2,15 +2,16 @@ import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, View,ScrollView,TextInput,SafeAreaView,Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Pressable} from 'react-native';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
   const navigation = useNavigation();
-  const [workers,setWorkers] = useState([{name:'Bob',rate:75},{name:'Bill',rate:100},{name:'Dave',rate:150}]);
+  const [workers,setWorkers] = useState([]);
 
   const [selectedWorker, setSelectedWorker] = useState(null);
-  const [editedWorker, setEditedWorker] = useState(false);
+  const [editedWorker, setEditedWorker] = useState({});
+  const [newWorker, setNewWorker] = useState(null);
 
   useEffect(()=>{
     const getWorkers = async () => {
@@ -29,25 +30,31 @@ export default function Index() {
     })
   }
   
-  },[workers])
+  },[]);
 
-  const selectWorker = (worker) => {
-    setSelectedWorker(worker);
-    console.log('worker', worker);
-  }
+  useEffect(()=>{
+    console.log('selected effect',selectedWorker);
+  },[selectedWorker])
+
+
 
   const addWorker = () => {
-    setNewWorker(true);
-    console.log('add worker');
+   if(workers.find((worker)=>worker.name===newWorker.name)){
+     Alert.alert('Error','Worker already exists');
+     return;
+    }
+    if(newWorker.rate<=0){
+      Alert.alert('Error','Rate must be greater than 0');
+      return;
+    }
+
+    setWorkers([...workers,newWorker]);
+    AsyncStorage.setItem('workers',JSON.stringify([...workers,newWorker]));
+    setNewWorker(null);
   }
-  const handleNameChange = (e) => {
-    console.log( e.nativeEvent.text);
-    setEditedWorker({...selectedWorker, name: e.nativeEvent.text});
-  }
-  const handleRateChange = (e) => {
-    console.log( e.nativeEvent.text);
-    setEditedWorker({...selectedWorker, rate: e.nativeEvent.text});
-  }
+
+
+
   const editWorker = () => {
     console.log('edit worker');
     Alert.alert('Edit Worker', `Are you sure you want to edit ${selectedWorker.name}?`, [
@@ -60,33 +67,57 @@ export default function Index() {
       {
         text: 'YES!!',
         onPress: () => {
-          console.log('editing worker');
-          const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
-          const index=workers.indexOf(oldworker);
+        
           setWorkers((workers)=>{
             const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
             const index=workers.indexOf(oldworker);
             workers[index]=editedWorker;
             return workers;
           });
+          AsyncStorage.setItem('workers',JSON.stringify(workers));
           setSelectedWorker(null);
+          setEditedWorker({});
         },
       },
     ]);
   }
 
+  const handleDelete=()=>{
+    if(selectedWorker){
+      Alert.alert('Delete Worker', `Are you sure you want to delete ${selectedWorker.name}?`, [
+        {
+          text: 'Cancel',
+          onPress: () => {
+            console.log('Cancel');
+          },
+        },
+        {
+          text: 'YES!!',
+          onPress: () => {
+            console.log('deleting worker');
+            const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
+            const index=workers.indexOf(oldworker);
+            workers.splice(index,1);
+            setWorkers([...workers]);
+            AsyncStorage.setItem('workers',JSON.stringify([...workers]));
+            setSelectedWorker(null);
+          },
+        },
+      ]);
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <View style={{ ...styles.workerList, flex: selectedWorker ? 0.2 : 0.6 }}>
+      <View style={{ ...styles.workerList, flex: selectedWorker ? 0.1 : 0.6 }}>
         <ScrollView>
           <Text style={styles.header}>Workers</Text>
-          {workers.map((worker, index) => {
+          {workers.length>0 && workers.map((worker, index) => {
             return (
               <Pressable
                 key={index}
-                onPress={() => {
-                  selectWorker(worker);
-                }}
+                onPress={()=>{console.log('selecting',worker,'selected',selectedWorker);setSelectedWorker(worker)}}
+                
               >
                 <Text style={styles.listItem}>
                   {worker.name} - £{worker.rate}/day
@@ -97,35 +128,63 @@ export default function Index() {
         </ScrollView>
       </View>
 
+
       {selectedWorker && (
         <SafeAreaView style={styles.workerDetails}>
           <Text style={styles.header}>Worker Details</Text>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>Name: {selectedWorker.name}</Text>
-            <TextInput style={styles.textInput}   placeholder="New name" onChange={handleNameChange} />
+            <TextInput style={styles.textInput}   placeholder="New name" onChange={(e)=>{ setEditedWorker({...selectedWorker, name: e.nativeEvent.text});}} />
           </View>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>
               Rate: £{selectedWorker.rate}/day
             </Text>
-            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="New rate" onChange={handleRateChange} />
+            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="New rate" onChange={()=>{   setEditedWorker({...selectedWorker, rate: e.nativeEvent.text});}} />
           </View>
           <View style={styles.bottom}>
+          <Button color='red' title="Delete" onPress={handleDelete} />
+          </View>
+
             <Button
-              title="Ok"
-              onPress={editWorker}
+              title=
+              {(editedWorker.name||editedWorker.rate)?"Save":"Back"}
+              onPress={editedWorker.name||editedWorker.rate?editWorker:setSelectedWorker(null)}
             />
+        </SafeAreaView>
+      )}
+
+
+      {newWorker && (
+        <SafeAreaView style={styles.workerDetails}>
+          <Text style={styles.header}>Add Worker</Text>
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>Name: </Text>
+            <TextInput style={styles.textInput}   placeholder="Name" 
+            onChange={(e)=>{setNewWorker({...newWorker,name:e.nativeEvent.text}
+            )}} />
+          </View>
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>Rate: </Text>
+            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="Rate" 
+            onChange={(e)=>{setNewWorker({...newWorker,rate:e.nativeEvent.text}
+            )}} />
+          </View>
+            <Button
+              title="Save"
+              onPress={addWorker}
+            />
+          <View style={styles.bottom}>
+            <Button title='Back' onPress={()=>{setNewWorker(null)}} />
           </View>
         </SafeAreaView>
       )}
 
-      {!selectedWorker && (
+      {!selectedWorker && !newWorker &&(
         <View style={styles.buttons}>
           <Button
             title="Add worker"
-            onPress={() => {
-              addWorker;   keyboardType="numeric"
-            }}
+            onPress={()=>{setNewWorker({name:'',rate:0})}}
           />
           <Button
             title="Home"
@@ -139,6 +198,7 @@ export default function Index() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     borderColor: "red",
