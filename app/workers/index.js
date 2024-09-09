@@ -14,6 +14,7 @@ export default function Index() {
   const [newWorker, setNewWorker] = useState(null);
 
   useEffect(()=>{
+  console.log('fired effect');
     const getWorkers = async () => {
       try {
         const jsonValue = await AsyncStorage.getItem('workers');
@@ -106,17 +107,21 @@ export default function Index() {
       ]);
     }
   }
+  const changeSelectedWorker = (worker) => {
+    console.log('changeSelectedWorker',worker);
+    setSelectedWorker(worker);
+  }
 
   return (
     <View style={styles.container}>
-      <View style={{ ...styles.workerList, flex: selectedWorker ? 0.1 : 0.6 }}>
+      <View style={{ ...styles.workerList, flex: selectedWorker || newWorker ? 0.1 : 0.6 }}>
         <ScrollView>
           <Text style={styles.header}>Workers</Text>
           {workers.length>0 && workers.map((worker, index) => {
             return (
               <Pressable
                 key={index}
-                onPress={()=>{console.log('selecting',worker,'selected',selectedWorker);setSelectedWorker(worker)}}
+                onPress={()=>{changeSelectedWorker(worker)}}
                 
               >
                 <Text style={styles.listItem}>
@@ -140,7 +145,7 @@ export default function Index() {
             <Text style={styles.itemDetails}>
               Rate: £{selectedWorker.rate}/day
             </Text>
-            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="New rate" onChange={()=>{   setEditedWorker({...selectedWorker, rate: e.nativeEvent.text});}} />
+            <TextInput style={styles.textInput}    keyboardType="numeric" placeholder="New rate" onChange={(e)=>{   setEditedWorker({...selectedWorker, rate: e.nativeEvent.text});}} />
           </View>
           <View style={styles.bottom}>
           <Button color='red' title="Delete" onPress={handleDelete} />
@@ -149,7 +154,7 @@ export default function Index() {
             <Button
               title=
               {(editedWorker.name||editedWorker.rate)?"Save":"Back"}
-              onPress={editedWorker.name||editedWorker.rate?editWorker:setSelectedWorker(null)}
+              onPress={editedWorker?editWorker:setSelectedWorker(null)}
             />
         </SafeAreaView>
       )}
@@ -194,6 +199,7 @@ export default function Index() {
           />
         </View>
       )}
+
       <StatusBar style="auto" />
     </View>
   );
