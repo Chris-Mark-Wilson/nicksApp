@@ -68,11 +68,11 @@ export const styles = StyleSheet.create({
       borderColor:'black',
       borderWidth:1,
       borderRadius:5,
-      paddingTop:0,
-      paddingLeft:5,
+    
+      paddingLeft:10,
       width:'100%',
       height:30,
-      margin:10,
+     
     },
     bottom:{
       

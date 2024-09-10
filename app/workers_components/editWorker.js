@@ -103,7 +103,7 @@ export const EditWorker = ({
   return (
     <>
       <ScrollView style={styles.workerDetails}>
-        <Text style={styles.header}>Worker Details</Text>
+        <Text style={styles.header}>{!editedWorker?'Worker Details':'Edit Worker'}</Text>
 
         <View style={styles.item}>
           <Text style={styles.itemDetails}>Name: {selectedWorker.name}</Text>

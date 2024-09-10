@@ -126,7 +126,7 @@ export const EditCustomer = ({
   return (
     <>
       <ScrollView style={styles.customerDetails}>
-        <Text style={styles.header}>Edit Customer</Text>
+        <Text style={styles.header}>{!editedCustomer?'Customer Details':'Edit Customer'}</Text>
         <View style={styles.item}>
           <Text style={styles.itemDetails}>Name: {selectedCustomer.name}</Text>
 
