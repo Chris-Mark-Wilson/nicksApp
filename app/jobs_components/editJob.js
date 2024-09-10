@@ -237,7 +237,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
             title="Update"
             onPress={() => {
               setEditedJob(JSON.parse(JSON.stringify(selectedJob)));
-              console.log(editedJob);
+             
             }}
           />
         )}

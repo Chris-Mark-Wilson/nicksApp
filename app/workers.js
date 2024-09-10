@@ -4,6 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { Pressable} from 'react-native';
 import { useState,useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WorkerList } from './workers_components/workerList';
+import { EditWorker } from './workers_components/editWorker';
+import { AddWorker } from './workers_components/addWorker';
+import { NavButtons } from './workers_components/navButtons';
 
 export default function Index() {
   const navigation = useNavigation();
@@ -33,233 +37,46 @@ export default function Index() {
   
   },[]);
 
-  useEffect(()=>{
-    console.log('selected effect',selectedWorker);
-  },[selectedWorker])
-
-
-
-  const addWorker = () => {
-   if(workers.find((worker)=>worker.name===newWorker.name)){
-     Alert.alert('Error','Worker already exists');
-     return;
-    }
-    if(newWorker.rate<=0){
-      Alert.alert('Error','Rate must be greater than 0');
-      return;
-    }
-
-    setWorkers([...workers,newWorker]);
-    AsyncStorage.setItem('workers',JSON.stringify([...workers,newWorker]));
-    setNewWorker(null);
-  }
-
-
-
-  const editWorker = () => {
-  console.log(editedWorker);
-    if(editedWorker.rate<=0 || isNaN(editedWorker.rate)){
-      Alert.alert('Error','Rate must be greater than 0');
-      return
-    }
-    if(editedWorker.name.length===0){
-      Alert.alert('Error','Name must not be empty');
-      return
-    }
-
-    Alert.alert('Edit Worker', `Are you sure you want to edit ${selectedWorker.name}?`, [
-      {
-        text: 'Cancel',
-        onPress: () => {
-          console.log('Cancel');
-        },
-      },
-      {
-        text: 'YES!!',
-        onPress: () => {
-        
-          setWorkers((workers)=>{
-            const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
-            const index=workers.indexOf(oldworker);
-            workers[index]=editedWorker;
-            return workers;
-          });
-          AsyncStorage.setItem('workers',JSON.stringify(workers));
-          setSelectedWorker(null);
-          setEditedWorker({});
-        },
-      },
-    ]);
-  }
-
-  const handleDelete=()=>{
-    if(selectedWorker){
-      Alert.alert('Delete Worker', `Are you sure you want to delete ${selectedWorker.name}?`, [
-        {
-          text: 'Cancel',
-          onPress: () => {
-            console.log('Cancel');
-          },
-        },
-        {
-          text: 'YES!!',
-          onPress: () => {
-            console.log('deleting worker');
-            const oldworker=workers.find((worker)=>worker.name===selectedWorker.name);
-            const index=workers.indexOf(oldworker);
-            workers.splice(index,1);
-            setWorkers([...workers]);
-            AsyncStorage.setItem('workers',JSON.stringify([...workers]));
-            setSelectedWorker(null);
-          },
-        },
-      ]);
-    }
-  }
-  const changeSelectedWorker = (worker) => {
-    console.log('changeSelectedWorker',worker);
-    setSelectedWorker(worker);
-  }
-
   return (
     <View style={styles.container}>
       {/* WORKER LIST  */}
-      {!selectedWorker && !newWorker && (
-        <View
-          style={{
-            ...styles.workerList,
-            display: selectedWorker || newWorker ? "none" : "flex",
-          }}
-        >
-          <ScrollView>
-            <Text style={styles.header}>Workers</Text>
-            {workers.length > 0 ? (
-              workers.map((worker, index) => {
-                return (
-                  <Pressable
-                    key={index}
-                    onPress={() => {
-                      changeSelectedWorker(worker);
-                    }}
-                  >
-                    <Text style={styles.listItem}>
-                      {worker.name} - £{worker.rate}/day
-                    </Text>
-                  </Pressable>
-                );
-              })
-            ) : (
-              <Text>No workers</Text>
-            )}
-          </ScrollView>
-        </View>
-      )}
-
-      {/*  EDIT WORKER  */}
-      {selectedWorker && (
-        <SafeAreaView style={styles.workerDetails}>
-          <Text style={styles.header}>Worker Details</Text>
-          <View style={styles.item}>
-            <Text style={styles.itemDetails}>Name: {selectedWorker.name}</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="New name"
-              onChange={(e) => {
-                setEditedWorker({
-                  ...selectedWorker,
-                  name: e.nativeEvent.text,
-                });
-              }}
-            />
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.itemDetails}>
-              Rate: £{selectedWorker.rate}/day
-            </Text>
-            <TextInput
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder="New rate"
-              onChange={(e) => {
-                setEditedWorker({
-                  ...selectedWorker,
-                  rate: e.nativeEvent.text,
-                });
-              }}
-            />
-          </View>
-          <View style={styles.bottom}>
-            <Button color="red" title="Delete" onPress={handleDelete} />
-          </View>
-
-          <View style={{ ...styles.buttons, flex: 0.8 }}>
-            {editedWorker && <Button title="Save" onPress={editWorker} />}
-
-            <Button
-              title="Back"
-              onPress={() => {
-                setEditedWorker(null);
-                setSelectedWorker(null);
-              }}
-            />
-          </View>
-        </SafeAreaView>
-      )}
+      {!selectedWorker && !newWorker && 
+        <WorkerList
+        workers={workers}
+        setSelectedWorker={setSelectedWorker}
+        />
+      }
 
       {/*  ADD WORKER  */}
-      {newWorker && (
-        <SafeAreaView style={styles.workerDetails}>
-          <Text style={styles.header}>Add Worker</Text>
-          <View style={styles.item}>
-            <Text style={styles.itemDetails}>Name: </Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Name"
-              onChange={(e) => {
-                setNewWorker({ ...newWorker, name: e.nativeEvent.text });
-              }}
-            />
-          </View>
-          <View style={styles.item}>
-            <Text style={styles.itemDetails}>Rate: </Text>
-            <TextInput
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder="Rate"
-              onChange={(e) => {
-                setNewWorker({ ...newWorker, rate: e.nativeEvent.text });
-              }}
-            />
-          </View>
-          <Button title="Save" onPress={addWorker} />
-          <View style={styles.bottom}>
-            <Button
-              title="Back"
-              onPress={() => {
-                setNewWorker(null);
-              }}
-            />
-          </View>
-        </SafeAreaView>
-      )}
+      {newWorker && 
+      <AddWorker
+        newWorker={newWorker}
+        setNewWorker={setNewWorker}
+        workers={workers}
+        setWorkers={setWorkers}
+      />
+      }
+
+      {/*  EDIT WORKER  */}
+      {selectedWorker &&       
+      <EditWorker
+        selectedWorker={selectedWorker}
+        setSelectedWorker={setSelectedWorker}
+        editedWorker={editedWorker}
+        setEditedWorker={setEditedWorker}
+        workers={workers}
+        setWorkers={setWorkers}
+      />
+      }
+
 
       {/*  NAV BUTTONS  */}
-      {!selectedWorker && !newWorker && (
-        <View style={styles.buttons}>
-          <Button
-            title="Add worker"
-            onPress={() => {
-              setNewWorker({ name: "", rate: 0 });
-            }}
-          />
-          <Button
-            title="Home"
-            onPress={() => {
-              navigation.navigate("index");
-            }}
-          />
-        </View>
-      )}
+      {!selectedWorker && !newWorker && 
+      <NavButtons
+        setNewWorker={setNewWorker}
+        navigation={navigation}
+      />
+      }
 
       <StatusBar style="auto" />
     </View>
