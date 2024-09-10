@@ -115,7 +115,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
               placeholder="New job name"
               onChange={(e) => {
                 setEditedJob({
-                  ...selectedJob,
+                  ...editedJob,
                   name: e.nativeEvent.text,
                 });
                 setIsEdited(true);
@@ -134,7 +134,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
               placeholder="New job address"
               onChange={(e) => {
                 setEditedJob({
-                  ...selectedJob,
+                  ...editedJob,
                   address: e.nativeEvent.text,
                 });
                 setIsEdited(true);
@@ -158,8 +158,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
               keyboardType="numeric"
               placeholder="Update timescale in days"
               onChange={(e) => {
-                setEditedJob({
-                  ...selectedJob,
+                setEditedJob({...editedJob,
                   quotedDays: e.nativeEvent.text,
                 });
                 setIsEdited(true);
@@ -182,7 +181,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
               placeholder="Update days worked"
               onChange={(e) => {
                 setEditedJob({
-                  ...selectedJob,
+                  ...editedJob,
                   daysWorked: e.nativeEvent.text,
                 });
                 setIsEdited(true);
@@ -219,7 +218,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
               placeholder="Update price"
               onChange={(e) => {
                 setEditedJob({
-                  ...selectedJob,
+                  ...editedJob,
                   price: e.nativeEvent.text,
                 });
                 setIsEdited(true);
@@ -229,7 +228,7 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
         </View>
       </ScrollView>
       {!isKeyboard &&
-      <View style={{ ...styles.buttons }}>
+      <View style={styles.buttons}>
         {isEdited && <Button title="Save" onPress={editJob} />}
 
         {!editedJob && (
@@ -237,7 +236,6 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
             title="Update"
             onPress={() => {
               setEditedJob(JSON.parse(JSON.stringify(selectedJob)));
-             
             }}
           />
         )}
@@ -245,8 +243,8 @@ export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
         <Button
           title="Back"
           onPress={() => {
-            editedJob?setEditedJob(null):setSelectedJob(null);
-         setEditedJob(null);setAddWorker(false);
+            if(editedJob){setEditedJob(null)}else{setSelectedJob(null);
+         setEditedJob(null);setAddWorker(false);}
           }}
         />
       </View>

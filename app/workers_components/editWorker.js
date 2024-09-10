@@ -113,7 +113,7 @@ export const EditWorker = ({
             placeholder="New name"
             onChange={(e) => {
               setEditedWorker({
-                ...selectedWorker,
+                ...editedWorker,
                 name: e.nativeEvent.text,
               });
               setIsEdited(true);
@@ -133,7 +133,7 @@ export const EditWorker = ({
             placeholder="New rate"
             onChange={(e) => {
               setEditedWorker({
-                ...selectedWorker,
+                ...editedWorker,
                 rate: e.nativeEvent.text,
               });
               setIsEdited(true);
@@ -161,8 +161,8 @@ export const EditWorker = ({
           <Button
             title="Back"
             onPress={() => {
-              editedWorker?setEditedWorker(null):setSelectedWorker(null);
-              setEditedWorker(null);
+              if(editedWorker){setEditedWorker(null)}else {setSelectedWorker(null);
+              setEditedWorker(null);}
             }}
           />
         </View>
