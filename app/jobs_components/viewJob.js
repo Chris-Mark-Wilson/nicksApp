@@ -3,7 +3,7 @@ import { useState,useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 
-export const EditJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAddWorker,jobs,setJobs}) => {
+export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAddWorker,jobs,setJobs}) => {
 
     useEffect(()=>{
     const keyboardShowListener = Keyboard.addListener(

@@ -7,7 +7,7 @@ import {Joblist} from './jobs_components/joblist';
 import { AddJob } from './jobs_components/addJob';
 import { SelectCustomer } from './jobs_components/selectCustomer';
 import { NavButtons } from './jobs_components/navButtons';
-import { EditJob } from './jobs_components/editJob';
+import { ViewJob } from './jobs_components/viewJob';
 import { styles } from './jobs_components/styles';
 
 export default function Index() {
@@ -68,7 +68,7 @@ export default function Index() {
 
    
       {selectedJob && (
-        <EditJob
+        <ViewJob
           editedJob={editedJob}
           setEditedJob={setEditedJob}
           selectedJob={selectedJob}
