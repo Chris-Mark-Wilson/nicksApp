@@ -6,14 +6,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export const AddJob = ({newJob,setNewJob,setSelectCustomer,setJobs,jobs}) => {  
 
     const addJob = () => {
-        console.log(newJob);
-        if(newJob.name.length===0){
-          Alert.alert('Error','Job name must not be empty');
-          return;
-        }
-    
-        if(newJob.address.length===0){
-          Alert.alert('Error','Wheres this job at then? It must have an address...');
+      if(newJob.name.length===0){
+        Alert.alert('Error','Job name must not be empty');
+        return;
+      }
+      
+      if(newJob.address.length===0){
+        Alert.alert('Error','Wheres this job at then? It must have an address...');
           return;
         }
     
@@ -21,12 +20,17 @@ export const AddJob = ({newJob,setNewJob,setSelectCustomer,setJobs,jobs}) => {
           Alert.alert('Error', 'Job name already exists');
           return;
         }
-    
+        
         if (newJob.price <= 0 || isNaN(newJob.price)) {
           Alert.alert('Error', 'No love jobs allowed! price must be greater than 0');
           return;
         }
-    
+        newJob.fuel=0;
+        newJob.materials=[];
+        newJob.dates_worked=[];
+        newJob.extras=[];
+        newJob.totalCosts=0;
+        console.log('new job',newJob);
         const updatedJobs = [...JSON.parse(JSON.stringify(jobs)), newJob];
         setJobs(updatedJobs);
         AsyncStorage.setItem('jobs', JSON.stringify(updatedJobs));
@@ -78,7 +82,7 @@ return (
     style={styles.textInput}
     keyboardType="numeric"
     placeholder="Quoted price"
-    onChange={(e) => {setNewJob({...newJob,price:e.nativeEvent.text})}}
+    onChange={(e) => {setNewJob({...newJob,price:+e.nativeEvent.text})}}
   />
 </View>
 <Button title="Save" onPress={addJob} />

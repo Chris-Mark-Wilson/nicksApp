@@ -1,5 +1,5 @@
-import { Button, Text, TextInput, View, ScrollView } from "react-native";
-
+import { Button, Text, TextInput, View, ScrollView, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 
 

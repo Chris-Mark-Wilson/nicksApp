@@ -51,10 +51,13 @@ export const styles = StyleSheet.create({
       justifyContent: 'space-around',
       width: '100%',
     },
+    button:{
+      margin:10,
+    },
     item: {
      justifyContent: 'space-between',
       flexDirection: 'column',
-      marginBottom:20,
+      marginBottom:10,
       width: '100%',
     },
     itemDetails: {

@@ -2,8 +2,11 @@ import { Keyboard,Button, Text, TextInput, View, Alert,ScrollView } from "react-
 import { useState,useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
+import { SelectWorkers } from "./selectWorkers";  
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { UpdateCosts } from "./updateCosts";
 
-export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAddWorker,jobs,setJobs}) => {
+export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editWorkers,setEditWorkers,jobs,setJobs}) => {
 
     useEffect(()=>{
     const keyboardShowListener = Keyboard.addListener(
@@ -26,7 +29,35 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
 },[]);
 
     const [isEdited, setIsEdited] = useState(false);
-    const[isKeyboard,setIsKeyboard] = useState(false);
+    const [isKeyboard, setIsKeyboard] = useState(false);
+
+    const [update,setUpdate]=useState(false);
+    const todaysDate = new Date().toDateString();  
+
+    const [materialsCost, setMaterialsCost] = useState(0);
+    const [wages, setWages] = useState(0);
+    const [totalExtras, setTotalExtras] = useState(0);
+    const [totalCosts, setTotalCosts] = useState(0);
+
+    useEffect(()=>{
+      setMaterialsCost(selectedJob.materials.length>0 ?
+      selectedJob.materials.reduce((acc, material) => acc + material.cost, 0)
+      :0);
+
+      setWages(selectedJob.dates_worked.length>0 ?
+      selectedJob.dates_worked.reduce((acc, day) => acc + day.workers.reduce((acc,worker)=>acc + worker.rate,0), 0)
+      :0);
+
+      setTotalExtras(selectedJob.extras.length>0 ?
+      selectedJob.extras.reduce((acc, extra) => acc + extra.cost, 0)
+      :0);
+
+      setTotalCosts(materialsCost + wages + selectedJob.fuel);
+
+    
+
+    },[selectedJob])
+
 
     const editJob = () => {
         console.log(editedJob);
@@ -55,13 +86,17 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
                 const index = jobs.findIndex(
                   (job) => job.name === selectedJob.name
                 );
+                
                 const newJobs = JSON.parse(JSON.stringify(jobs));
                 newJobs[index] = editedJob;
                 setJobs(newJobs);
                 AsyncStorage.setItem("jobs", JSON.stringify(newJobs)); // Update AsyncStorage
     
-                // setSelectedJob(null);
+              
+                setSelectedJob(editedJob);
                 setEditedJob(null);
+                setIsEdited(false);
+       
               },
             },
           ]
@@ -87,7 +122,7 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
                   const newJobs = jobs.filter((job) => job.name !== selectedJob.name);
                   return newJobs;
                 });
-                AsyncStorage.setItem('jobs', JSON.stringify(jobs)); // Update AsyncStorage
+                AsyncStorage.setItem('jobs', JSON.stringify(jobs)); 
                 setEditedJob(null);
                 setSelectedJob(null);
             },
@@ -100,8 +135,10 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
 
   return (
     <>
+    { !update &&
       <ScrollView style={styles.jobDetails}>
         <Text style={styles.header}>{editedJob?'Edit Job':'Job Summary'}</Text>
+        <Text style={styles.header}>{todaysDate}</Text>
         <View style={styles.item}>
           <Text style={styles.itemDetails}>
             Customer: {selectedJob.customer}
@@ -145,66 +182,16 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
 
  
 
-        <View style={styles.item}>
-          <Text style={styles.itemDetails}>
-            Quoted Timescale:{" "}
-            {selectedJob.quotedDays
-              ? selectedJob.quotedDays + "days"
-              : "No timescale given"}{" "}
-          </Text>
-          {editedJob && (
-            <TextInput
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder="Update timescale in days"
-              onChange={(e) => {
-                setEditedJob({...editedJob,
-                  quotedDays: e.nativeEvent.text,
-                });
-                setIsEdited(true);
-              }}
-            />
-          )}
-        </View>
 
         <View style={styles.item}>
           <Text style={styles.itemDetails}>
-            Days to Date:{" "}
-            {selectedJob.daysWorked
-              ? selectedJob.daysWorked
+            Start date:{" "}
+            {selectedJob.startDate
+              ? selectedJob.startDate
               : "Job not started"}
           </Text>
-          {editedJob && (
-            <TextInput
-              style={styles.textInput}
-              keyboardType="numeric"
-              placeholder="Update days worked"
-              onChange={(e) => {
-                setEditedJob({
-                  ...editedJob,
-                  daysWorked: e.nativeEvent.text,
-                });
-                setIsEdited(true);
-              }}
-            />
-          )}
-        </View>
-
-        <View style={styles.item}>
-          <Text style={styles.itemDetails}>
-            Number of Workers:{" "}
-            {selectedJob.workers && selectedJob.workers.length
-              ? selectedJob.workers.length
-              : "No workers"}
-          </Text>
-          {editedJob && (
-            <Button
-              title="Add Worker"
-              onPress={() => {
-                setAddWorker(true);
-              }}
-            />
-          )}
+      
+      
         </View>
 
         <View style={styles.item}>
@@ -226,31 +213,86 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,setAd
             />
           )}
         </View>
+
+        <View style={styles.item}>
+          <Text style={styles.itemDetails}>
+            Extras: £{totalExtras}   Total Price: £{Number(selectedJob.price)+Number(totalExtras)}
+          </Text>
+        </View>
+
+        <View style={styles.item}>
+          <Text style={styles.itemDetails}>
+            Current balance: £{(Number(selectedJob.price) + (Number(totalExtras) - Number(totalCosts)))}
+          </Text>
+        </View>
+
+        <View style={styles.item}>
+          <Text style={styles.itemDetails}>
+            Materials: £{materialsCost}   Fuel: £{selectedJob.fuel}
+          </Text>
+        </View>
+
+        <View style={styles.item}>
+          <Text style={styles.itemDetails}>
+            Wages: £{wages}
+          </Text>
+        </View>
+
+        {!editedJob && <Button
+          title="Edit Job Details"
+          onPress={() => {
+            setEditedJob(JSON.parse(JSON.stringify(selectedJob)));
+          }}
+        />
+        }
       </ScrollView>
-      {!isKeyboard &&
+      }
+
+      {update && (
+  <UpdateCosts
+  selectedJob={selectedJob}
+  setSelectedJob={setSelectedJob}
+  setUpdate={setUpdate}
+  isKeyboard={isKeyboard}
+ 
+
+  />
+      )}
+
+
+
+      {!isKeyboard && !update &&
       <View style={styles.buttons}>
         {isEdited && <Button title="Save" onPress={editJob} />}
 
         {!editedJob && (
+          <>
+
           <Button
-            title="Update"
-            onPress={() => {
-              setEditedJob(JSON.parse(JSON.stringify(selectedJob)));
-            }}
+          title="Update costs"
+          onPress={() => {
+            setUpdate(true);
+          }}
           />
+
+        </>
         )}
 
         <Button
           title="Back"
           onPress={() => {
-            if(editedJob){setEditedJob(null)}else{setSelectedJob(null);
-         setEditedJob(null);setAddWorker(false);}
+            if(editedJob){
+              setEditedJob(null);
+              setEditWorkers(null)
+            }else{
+              setSelectedJob(null);
+         setEditedJob(null);setEditWorkers(false);}
           }}
         />
       </View>
     }
 
-      {editedJob && !isKeyboard &&
+      {editedJob && !isKeyboard && !editWorkers &&
       <View style={styles.bottom}>
         <Button color="red" title="Delete" onPress={handleDelete} />
       </View>

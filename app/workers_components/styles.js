@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "space-between",
   
-    
+
     },
     header: {
       fontSize: 24,

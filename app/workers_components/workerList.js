@@ -2,13 +2,13 @@ import { ScrollView, Text, View,Pressable } from "react-native";
 
 import { styles } from "./styles"
 
-export const WorkerList=({setSelectedWorker,workers})=>{
+export const WorkerList=({setSelectedWorker,workers,title='Workers'})=>{
 
 
     return (
         <View style={styles.workerList}>
             <ScrollView>
-            <Text style={styles.header}>Workers</Text>
+            <Text style={styles.header}>{title}</Text>
             {workers.length > 0 ? (
             workers.map((worker, index) => {
                 return (

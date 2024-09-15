@@ -17,7 +17,7 @@ export default function Index() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [editedJob, setEditedJob] = useState(null);
   const [newJob, setNewJob] = useState(null);
-  const [addWorker,setAddWorker] = useState(false);
+  const [editWorkers,setEditWorkers] = useState(false);
   const [customers,setCustomers] = useState([]);
   const [selectCustomer,setSelectCustomer] = useState(false);
 
@@ -35,7 +35,8 @@ export default function Index() {
 
     if (jobs.length === 0) {
       getJobs().then((data) => {
-        setJobs(data);
+        console.log('data',data);
+        setJobs([...data]);
       });
     }
   }, []);
@@ -73,7 +74,8 @@ export default function Index() {
           setEditedJob={setEditedJob}
           selectedJob={selectedJob}
           setSelectedJob={setSelectedJob}
-          setAddWorker={setAddWorker}
+          editWorkers={editWorkers}
+          setEditWorkers={setEditWorkers}
           jobs={jobs}
           setJobs={setJobs}
         />

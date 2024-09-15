@@ -1,4 +1,5 @@
-import { Button, SafeAreaView, Text, TextInput, View } from "react-native";
+import { Button, Alert,SafeAreaView, Text, TextInput, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 
 
@@ -39,7 +40,7 @@ export const AddWorker=({newWorker,setNewWorker,workers,setWorkers})=>{
             keyboardType="numeric"
             placeholder="Rate"
             onChange={(e) => {
-              setNewWorker({ ...newWorker, rate: e.nativeEvent.text });
+              setNewWorker({ ...newWorker, rate: Number(e.nativeEvent.text) });
             }}
           />
         </View>
