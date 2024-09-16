@@ -1,4 +1,4 @@
-import { ScrollView,Text,View,Button } from 'react-native';
+import { ScrollView,Text,View,Button, TextInput } from 'react-native';
 import { useState,useEffect } from 'react';
 import { styles } from './styles';
 import { SelectWorkers } from './selectWorkers';
@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-export const UpdateCosts = ({selectedJob,setSelectedJob,setUpdate,isKeyboard}) => {
+export const UpdateJob = ({selectedJob,setSelectedJob,setUpdate,isKeyboard}) => {
 
     console.log('job in updateCosts',selectedJob);
 
@@ -30,10 +30,7 @@ useEffect(()=>{
 
     console.log('job in updateCosts',JSON.stringify(selectedJob,null,1));
     console.log('selected job datesWorked',JSON.stringify(selectedJob.dates_worked,null,1));
-    //fire this into selectedJob here..
-    //make it obvious that the job has been updated, and show a save button
-    //start date for job will now be the first date either worked, or materials or fuel was added
-    //setSelectedJob({...selectedJob,materials,fuel,dates_worked});
+
 console.log('datesWorked',JSON.stringify(datesWorked,null,1));
   
 
@@ -56,30 +53,48 @@ console.log('jobs in saveData',JSON.stringify(jobs));
 
     return (
       <>
-        {!addWorkers && (
+        {!addWorkers && 
           <ScrollView style={styles.jobDetails}>
             <Text style={styles.header}>Update Costs</Text>
 
             {!dateSelected && <Text style={styles.header}>Select a date</Text>}
 
-            {dateSelected && (
+            {dateSelected && 
               <>
                 <Text style={styles.header}>{date.toDateString()}</Text>
                 <View style={styles.item}>
-                  <Button
-                    title="register workers"
-                    onPress={() => {
-                      setAddWorkers(true);
-                    }}
-                  />
+                  <View style={styles.button}>
+                    <Button
+                      title="register workers"
+                      onPress={() => {
+                        setAddWorkers(true);
+                      }}
+                    />
+                  </View>
                 </View>
 
                 <View style={styles.item}>
-                  <Button title="add fuel" onPress={() => {}} />
+                  <View style={styles.button}>
+                    <Button title="add fuel" onPress={() => {setAddFuel(true)}} />
+                  </View>
+                </View>
+
+                {addFuel &&
+                <TextInput style={styles.textInput} placeholder="Fuel cost" keyboardType="numeric" onChange={(e)=>{
+                  setFuel([...fuel,{date:date,cost:+e.nativeEvent.text}]);
+                setIsUpdated(true)}}/>
+    }
+
+                <View style={styles.item}>
+                  <View style={styles.button}>
+                    <Button title="add material" onPress={() => {}} />
+                  </View>
                 </View>
 
                 <View style={styles.item}>
-                  <Button title="add material" onPress={() => {}} />
+                  <View style={styles.button}>
+                    <Button title="add job extra" onPress={() => {}} />
+                  </View>
                 </View>
 
                 {selectedJob.workers && selectedJob.workers.length > 0 && (
@@ -93,9 +108,9 @@ console.log('jobs in saveData',JSON.stringify(jobs));
                   </View>
                 )}
               </>
-            )}
+            }
           </ScrollView>
-        )}
+        }
 
         {addWorkers && (
           <>

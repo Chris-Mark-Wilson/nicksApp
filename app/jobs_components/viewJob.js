@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { SelectWorkers } from "./selectWorkers";  
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { UpdateCosts } from "./updateCosts";
+import { UpdateJob } from "./updateJob";
 
 export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editWorkers,setEditWorkers,jobs,setJobs}) => {
 
@@ -44,7 +44,7 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
       selectedJob.extras.reduce((acc, extra) => acc + extra.cost, 0)
       :0);
       const [totalFuel,setTotalFuel]=useState(selectedJob.fuel.reduce((acc,fuel)=>acc+fuel.cost,0));
-    const [totalCosts, setTotalCosts] = useState(0);
+    const [totalCosts, setTotalCosts] = useState(materialsCost + wages + totalFuel);
 
     useEffect(()=>{
       setMaterialsCost(selectedJob.materials.length>0 ?
@@ -59,9 +59,8 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
       selectedJob.extras.reduce((acc, extra) => acc + extra.cost, 0)
       :0);
 
-      setTotalCosts(materialsCost + wages + selectedJob.fuel);
-
-    
+        setTotalFuel(selectedJob.fuel.reduce((acc,fuel)=>acc+fuel.cost,0));
+      setTotalCosts(materialsCost + wages + totalFuel);
 
     },[selectedJob])
 
@@ -256,7 +255,7 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
       }
 
       {update && (
-  <UpdateCosts
+  <UpdateJob
   selectedJob={selectedJob}
   setSelectedJob={setSelectedJob}
   setUpdate={setUpdate}
@@ -276,7 +275,7 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
           <>
 
           <Button
-          title="Update costs"
+          title="Update costs / Add extras"
           onPress={() => {
             setUpdate(true);
           }}
