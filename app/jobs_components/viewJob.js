@@ -34,9 +34,16 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
     const [update,setUpdate]=useState(false);
     const todaysDate = new Date().toDateString();  
 
-    const [materialsCost, setMaterialsCost] = useState(0);
-    const [wages, setWages] = useState(0);
-    const [totalExtras, setTotalExtras] = useState(0);
+    const [materialsCost, setMaterialsCost] = useState(selectedJob.materials.length>0 ?
+      selectedJob.materials.reduce((acc, material) => acc + material.cost, 0)
+      :0);
+    const [wages, setWages] = useState(selectedJob.dates_worked.length>0 ?
+      selectedJob.dates_worked.reduce((acc, day) => acc + day.workers.reduce((acc,worker)=>acc + worker.rate,0), 0)
+      :0);
+    const [totalExtras, setTotalExtras] = useState(selectedJob.extras.length>0 ?
+      selectedJob.extras.reduce((acc, extra) => acc + extra.cost, 0)
+      :0);
+      const [totalFuel,setTotalFuel]=useState(selectedJob.fuel.reduce((acc,fuel)=>acc+fuel.cost,0));
     const [totalCosts, setTotalCosts] = useState(0);
 
     useEffect(()=>{
@@ -228,7 +235,7 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
 
         <View style={styles.item}>
           <Text style={styles.itemDetails}>
-            Materials: £{materialsCost}   Fuel: £{selectedJob.fuel}
+            Materials: £{materialsCost}   Fuel: £{totalFuel}
           </Text>
         </View>
 

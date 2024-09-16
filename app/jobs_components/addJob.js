@@ -29,7 +29,7 @@ export const AddJob = ({newJob,setNewJob,setSelectCustomer,setJobs,jobs}) => {
         newJob.materials=[];
         newJob.dates_worked=[];
         newJob.extras=[];
-        newJob.totalCosts=0;
+        newJob.completed=false;
         console.log('new job',newJob);
         const updatedJobs = [...JSON.parse(JSON.stringify(jobs)), newJob];
         setJobs(updatedJobs);
