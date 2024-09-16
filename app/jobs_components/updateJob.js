@@ -5,6 +5,7 @@ import { SelectWorkers } from './selectWorkers';
 import { DatePicker } from './datePicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AddFuel } from './addFuel';
+import { AddMaterial } from './addMaterial';
 
 
 
@@ -32,10 +33,6 @@ useEffect(()=>{
 
     console.log('selected job in updateJob',JSON.stringify(selectedJob,null,1));
 
-
-
-  
-
 },[datesWorked,fuel,materials]);
 
 const saveData = async () => {
@@ -56,7 +53,7 @@ console.log('jobs in saveData',JSON.stringify(jobs));
 
     return (
       <>
-        {!addWorkers && !addFuel && 
+        {!addWorkers && !addFuel && !addMaterial && !addExtra && 
           <ScrollView style={styles.jobDetails}>
             <Text style={styles.header}>Update Costs</Text>
 
@@ -84,7 +81,7 @@ console.log('jobs in saveData',JSON.stringify(jobs));
 
                 <View style={styles.item}>
                   <View style={styles.button}>
-                    <Button title="add material" onPress={() => {}} />
+                    <Button title="add material" onPress={() => {setAddMaterial(true)}} />
                   </View>
                 </View>
 
@@ -129,6 +126,19 @@ console.log('jobs in saveData',JSON.stringify(jobs));
             setIsUpdated={setIsUpdated}
             date={date}/>
         }
+
+        {addMaterial && (
+          <>
+          <AddMaterial
+            materials={materials}
+            setMaterials={setMaterials}
+            setAddMaterial={setAddMaterial}
+            setIsUpdated={setIsUpdated}
+            date={date}
+          />
+          </>
+        )}
+        
 
         {!isKeyboard && !addWorkers && !addFuel &&(
           <>
