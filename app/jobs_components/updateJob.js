@@ -6,6 +6,7 @@ import { DatePicker } from './datePicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AddFuel } from './addFuel';
 import { AddMaterial } from './addMaterial';
+import { AddExtra } from './addExtra';
 
 
 
@@ -29,11 +30,11 @@ const [isUpdated,setIsUpdated]=useState(false);//flag to show job has been updat
 
 useEffect(()=>{
 
-    setSelectedJob({...selectedJob,materials:[...materials],fuel:[...fuel],dates_worked:[...datesWorked]});
+    setSelectedJob({...selectedJob,materials:[...materials],fuel:[...fuel],dates_worked:[...datesWorked],extras:[...extras]});
 
     console.log('selected job in updateJob',JSON.stringify(selectedJob,null,1));
 
-},[datesWorked,fuel,materials]);
+},[datesWorked,fuel,materials,extras]);
 
 const saveData = async () => {
     try{
@@ -87,20 +88,11 @@ console.log('jobs in saveData',JSON.stringify(jobs));
 
                 <View style={styles.item}>
                   <View style={styles.button}>
-                    <Button title="add job extra" onPress={() => {}} />
+                    <Button title="add job extra" onPress={() => {setAddExtra(true)}} />
                   </View>
                 </View>
 
-                {selectedJob.workers && selectedJob.workers.length > 0 && (
-                  <View style={styles.item}>
-                    <Text style={styles.itemDetails}>Workers</Text>
-                    <Text style={styles.itemDetails}>
-                      {selectedJob.workers
-                        .map((worker) => worker.name)
-                        .join(", ")}
-                    </Text>
-                  </View>
-                )}
+         
               </>
             }
           </ScrollView>
@@ -133,6 +125,19 @@ console.log('jobs in saveData',JSON.stringify(jobs));
             materials={materials}
             setMaterials={setMaterials}
             setAddMaterial={setAddMaterial}
+            setIsUpdated={setIsUpdated}
+            date={date}
+          />
+          </>
+        )}
+
+
+{addExtra && (
+          <>
+          <AddExtra
+            extras={extras}
+            setExtras={setExtras}
+            setAddExtra={setAddExtra}
             setIsUpdated={setIsUpdated}
             date={date}
           />
