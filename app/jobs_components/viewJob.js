@@ -61,8 +61,8 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
 
         setTotalFuel(selectedJob.fuel.reduce((acc,fuel)=>acc+fuel.cost,0));
       setTotalCosts(materialsCost + wages + totalFuel);
-
-    },[selectedJob])
+console.log('total costs in view job use effect',totalCosts);
+    },[selectedJob,materialsCost,wages,totalExtras,totalFuel]);
 
 
     const editJob = () => {

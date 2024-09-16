@@ -25,7 +25,7 @@ export const AddJob = ({newJob,setNewJob,setSelectCustomer,setJobs,jobs}) => {
           Alert.alert('Error', 'No love jobs allowed! price must be greater than 0');
           return;
         }
-        newJob.fuel=0;
+        newJob.fuel=[];
         newJob.materials=[];
         newJob.dates_worked=[];
         newJob.extras=[];

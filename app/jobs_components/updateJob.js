@@ -4,13 +4,14 @@ import { styles } from './styles';
 import { SelectWorkers } from './selectWorkers';
 import { DatePicker } from './datePicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AddFuel } from './addFuel';
 
 
 
 
 export const UpdateJob = ({selectedJob,setSelectedJob,setUpdate,isKeyboard}) => {
 
-    console.log('job in updateCosts',selectedJob);
+    
 
 const [addWorkers,setAddWorkers]=useState(false); //flag to show selectWorkers component
 const [addMaterial,setAddMaterial]=useState(false); //flag to show addMaterial component
@@ -18,6 +19,7 @@ const [addFuel,setAddFuel]=useState(false);//flag to show addFuel component
 const [addExtra,setAddExtra]=useState(false);//flag to show addExtra component
 const [materials,setMaterials]=useState(selectedJob.materials || []);//array of materials used
 const [fuel,setFuel]=useState(selectedJob.fuel || []);//array of fuel entries
+const [extras,setExtras]=useState(selectedJob.extras || []);//array of extra jobs
 const [datesWorked,setDatesWorked]=useState([...selectedJob.dates_worked] || []);//array of days worked, each day has an array of workers {date: 'date', workers:[{name:'name',rate:rate}]}
 
 const [date,setDate]=useState(new Date());//date to be selected 
@@ -26,12 +28,12 @@ const [isUpdated,setIsUpdated]=useState(false);//flag to show job has been updat
 
 useEffect(()=>{
 
-    setSelectedJob({...selectedJob,materials:[...materials],fuel:fuel,dates_worked:[...datesWorked]});
+    setSelectedJob({...selectedJob,materials:[...materials],fuel:[...fuel],dates_worked:[...datesWorked]});
 
-    console.log('job in updateCosts',JSON.stringify(selectedJob,null,1));
-    console.log('selected job datesWorked',JSON.stringify(selectedJob.dates_worked,null,1));
+    console.log('selected job in updateJob',JSON.stringify(selectedJob,null,1));
 
-console.log('datesWorked',JSON.stringify(datesWorked,null,1));
+
+
   
 
 },[datesWorked,fuel,materials]);
@@ -42,8 +44,9 @@ const saveData = async () => {
 console.log('jobs in saveData',JSON.stringify(jobs));
     const index = jobs.findIndex((job) => job.name === selectedJob.name);
     jobs[index] = JSON.parse(JSON.stringify(selectedJob));
-    console.log('jobs after update',jobs);
+    console.log('jobs after update',JSON.stringify(jobs));
     await AsyncStorage.setItem('jobs', JSON.stringify(jobs));
+    setSelectedJob(jobs[index]);
     }
     catch(e){
         console.log('error saving data',e);
@@ -53,7 +56,7 @@ console.log('jobs in saveData',JSON.stringify(jobs));
 
     return (
       <>
-        {!addWorkers && 
+        {!addWorkers && !addFuel && 
           <ScrollView style={styles.jobDetails}>
             <Text style={styles.header}>Update Costs</Text>
 
@@ -78,12 +81,6 @@ console.log('jobs in saveData',JSON.stringify(jobs));
                     <Button title="add fuel" onPress={() => {setAddFuel(true)}} />
                   </View>
                 </View>
-
-                {addFuel &&
-                <TextInput style={styles.textInput} placeholder="Fuel cost" keyboardType="numeric" onChange={(e)=>{
-                  setFuel([...fuel,{date:date,cost:+e.nativeEvent.text}]);
-                setIsUpdated(true)}}/>
-    }
 
                 <View style={styles.item}>
                   <View style={styles.button}>
@@ -124,7 +121,16 @@ console.log('jobs in saveData',JSON.stringify(jobs));
           </>
         )}
 
-        {!isKeyboard && !addWorkers && (
+        {addFuel &&
+            <AddFuel 
+            fuel={fuel}
+            setFuel={setFuel} 
+            setAddFuel={setAddFuel} 
+            setIsUpdated={setIsUpdated}
+            date={date}/>
+        }
+
+        {!isKeyboard && !addWorkers && !addFuel &&(
           <>
             <View style={styles.buttons}>
               <DatePicker

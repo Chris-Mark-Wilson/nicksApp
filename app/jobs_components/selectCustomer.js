@@ -2,11 +2,14 @@ import { Text, View, Button, Pressable, ScrollView } from "react-native";
 import { styles } from "./styles";
 
 export const SelectCustomer=({setNewJob,setSelectCustomer,newJob,customers})=>{
-    return (
+   
+  
+  
+  return (
         <>
-        <Text style={styles.header}>Select Customer</Text>
        <ScrollView style={styles.jobList}>
-          {customers.length > 0 && 
+        <Text style={styles.header}>Select Customer</Text>
+          {customers && customers.length > 0 && 
             customers.map((customer, index) => {
               return (
                 <Pressable
@@ -21,6 +24,7 @@ export const SelectCustomer=({setNewJob,setSelectCustomer,newJob,customers})=>{
                 </Pressable>
           )})
           }
+          {!customers && <Text style={{fontSize:20}}>No customers to show, please add a customer to the database before selecting a customer</Text>}
         </ScrollView>
       
         <View style={styles.bottom}>
