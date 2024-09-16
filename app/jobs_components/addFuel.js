@@ -1,4 +1,4 @@
-import { View, Text, ScrollView,TextInput,Button,Pressable } from 'react-native';
+import { View, Text, ScrollView,TextInput,Button,Pressable,Alert } from 'react-native';
 import { useState } from 'react';
 import { styles } from './styles';
 
@@ -15,6 +15,9 @@ const updateFuel=()=>{
     setEnteredFuel(0);
 }
 const deleteEntry=(index)=>{
+    Alert.alert('Delete','Are you sure you want to delete this entry?',[{text:'Yes',onPress:()=>{deleteEntryConfirmed(index)}},{text:'No'}]);
+}
+const deleteEntryConfirmed=(index)=>{
     const updatedFuel=[...fuel];
     updatedFuel.splice(index,1);
     setFuel(updatedFuel);
