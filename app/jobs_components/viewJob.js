@@ -1,10 +1,11 @@
-import { Keyboard,Button, Text, TextInput, View, Alert,ScrollView } from "react-native";
+import { Keyboard,Button, Text, TextInput, View, Alert,ScrollView,Pressable } from "react-native";
 import { useState,useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./styles";
 import { SelectWorkers } from "./selectWorkers";  
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { UpdateJob } from "./updateJob";
+import { ViewDetails } from "./viewDetails";
 
 export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editWorkers,setEditWorkers,jobs,setJobs}) => {
 
@@ -33,6 +34,8 @@ export const ViewJob = ({editedJob,setEditedJob,selectedJob,setSelectedJob,editW
 
     const [update,setUpdate]=useState(false);
     const todaysDate = new Date().toDateString();  
+
+    const [details, setDetails] = useState(null);
 
     const [materialsCost, setMaterialsCost] = useState(selectedJob.materials.length>0 ?
       selectedJob.materials.reduce((acc, material) => acc + material.cost, 0)
@@ -141,7 +144,7 @@ console.log('total costs in view job use effect',totalCosts);
 
   return (
     <>
-    { !update &&
+    { !update  && !details &&
       <ScrollView style={styles.jobDetails}>
         <Text style={styles.header}>{editedJob?'Edit Job':'Job Summary'}</Text>
         <Text style={styles.header}>{todaysDate}</Text>
@@ -220,11 +223,20 @@ console.log('total costs in view job use effect',totalCosts);
           )}
         </View>
 
+
+        <Pressable onPress={()=>setDetails('Extras')}>
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>
+              Extras: £{totalExtras}   
+            </Text>
+          </View>
+        </Pressable>
+
         <View style={styles.item}>
-          <Text style={styles.itemDetails}>
-            Extras: £{totalExtras}   Total Price: £{Number(selectedJob.price)+Number(totalExtras)}
-          </Text>
-        </View>
+            <Text style={styles.itemDetails}>
+          Total Price: £{Number(selectedJob.price)+Number(totalExtras)}
+            </Text>
+          </View>
 
         <View style={styles.item}>
           <Text style={styles.itemDetails}>
@@ -232,17 +244,30 @@ console.log('total costs in view job use effect',totalCosts);
           </Text>
         </View>
 
-        <View style={styles.item}>
-          <Text style={styles.itemDetails}>
-            Materials: £{materialsCost}   Fuel: £{totalFuel}
-          </Text>
-        </View>
 
-        <View style={styles.item}>
-          <Text style={styles.itemDetails}>
-            Wages: £{wages}
-          </Text>
-        </View>
+        <Pressable onPress={()=>setDetails('Materials')}>
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>
+              Materials: £{materialsCost} 
+            </Text>
+          </View>
+        </Pressable>
+
+        <Pressable onPress={()=>setDetails('Fuel')}>
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>
+              Fuel: £{totalFuel}
+            </Text>
+          </View>
+        </Pressable>
+
+        <Pressable onPress={()=>setDetails('Days worked')}>
+          <View style={styles.item}>
+            <Text style={styles.itemDetails}>
+              Wages: £{wages}
+            </Text>
+          </View>
+        </Pressable>
 
         {!editedJob && <Button
           title="Edit Job Details"
@@ -265,9 +290,17 @@ console.log('total costs in view job use effect',totalCosts);
   />
       )}
 
+      {details && 
+      <ViewDetails
+      selectedJob={selectedJob}
+      details={details}
+      setDetails={setDetails}
+      />
+      }
 
 
-      {!isKeyboard && !update &&
+
+      {!isKeyboard && !update && !details &&
       <View style={styles.buttons}>
         {isEdited && <Button title="Save" onPress={editJob} />}
 
@@ -298,7 +331,7 @@ console.log('total costs in view job use effect',totalCosts);
       </View>
     }
 
-      {editedJob && !isKeyboard && !editWorkers &&
+      {editedJob && !isKeyboard && !editWorkers && details!=='' &&
       <View style={styles.bottom}>
         <Button color="red" title="Delete" onPress={handleDelete} />
       </View>

@@ -61,6 +61,8 @@ export const styles = StyleSheet.create({
       width: '100%',
     },
     itemDetails: {
+   
+      flexDirection:'row',
       margin: 0,
       fontSize: 18,
       color: 'black',
