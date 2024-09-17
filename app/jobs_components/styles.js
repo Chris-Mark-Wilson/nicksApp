@@ -79,4 +79,14 @@ export const styles = StyleSheet.create({
     bottom: {
     margin:20
     },
+    viewItem:{
+      flexDirection:'row',
+      margin: 0,
+      fontSize: 18,
+      color: 'black',
+      justifyContent: "space-between",
+      width: "100%",
+      borderBottomColor: "red",
+      borderBottomWidth: 1,
+    }
   });

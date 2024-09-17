@@ -264,7 +264,7 @@ console.log('total costs in view job use effect',totalCosts);
         <Pressable onPress={()=>setDetails('Days worked')}>
           <View style={styles.item}>
             <Text style={styles.itemDetails}>
-              Wages: £{wages}
+              Labour: £{wages}
             </Text>
           </View>
         </Pressable>

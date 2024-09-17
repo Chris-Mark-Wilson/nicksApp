@@ -37,42 +37,59 @@ export const ViewDetails = ({selectedJob,details,setDetails}) => {
             <Text style={styles.header}>{details}</Text>
             {list && list.length>0 && list.map((item,index) => {
                 return (
-                        <View key={index} style={styles.item}>
-                            {!item.hasOwnProperty('workers') ?
-                            <>
-                            <Text  style={styles.itemDetails}>
-                            {item.date}....{!item.description ? `£${item.cost}` : null}
+                  <View key={index} style={styles.item}>
+                    {!item.hasOwnProperty("workers") ? (
+                     <>
+                        {!item.hasOwnProperty('description') ? 
+                                                  
+                          <View style={styles.viewItem}>
+                            <Text style={{ ...styles.itemDetails }}>
+                              {item.date}
                             </Text>
-                            
+                            <Text style={styles.itemDetails}>£{item.cost}</Text>
+                          </View>
+                         :
+                         <> 
+                            <Text style={styles.itemDetails}>{item.date}</Text>
+                          <View style={styles.viewItem}>
                             <Text style={styles.itemDetails}>
-                            {item.hasOwnProperty('description') ? `${item.description}....£${item.cost}`:null}
+                              {item.description}
                             </Text>
-                            </>
-                            :
-                        <>
                             <Text style={styles.itemDetails}>
-                            {item.date}
+                              £{item.cost}
                             </Text>
-                            {item.workers.map((worker,i) => {
-                                return (
-                                    <View key={i} style={{...styles.itemDetails,justifyContent:'space-between',width:'100%',borderBottomColor:'red',borderBottomWidth:1}}>
-                                    <Text style={styles.itemDetails}>
-                                    {worker.name}
-                                    </Text>
-                                    <Text style={styles.itemDetails}>
-                                    £{worker.rate}
-                                    </Text>
-                                    </View>
-                                    
-                                    
-                                )
-                            })
-                            }
-                            </>
-                        }
-
-                        </View>
-                )
+                          </View>
+                        </>
+                    }
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.itemDetails}>{item.date}</Text>
+                        {item.workers.map((worker, i) => {
+                          return (
+                            <View
+                              key={i}
+                              style={{
+                                ...styles.itemDetails,
+                                justifyContent: "space-between",
+                                width: "100%",
+                                borderBottomColor: "red",
+                                borderBottomWidth: 1,
+                              }}
+                            >
+                              <Text style={styles.itemDetails}>
+                                {worker.name}
+                              </Text>
+                              <Text style={styles.itemDetails}>
+                                £{worker.rate}
+                              </Text>
+                            </View>
+                          );
+                        })}
+                      </>
+                    )}
+                  </View>
+                );
             })}
             <View style={styles.button}>
             <Button title="Back" onPress={() => {setDetails(null)}} />
