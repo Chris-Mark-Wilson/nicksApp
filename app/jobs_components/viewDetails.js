@@ -42,23 +42,23 @@ export const ViewDetails = ({selectedJob,details,setDetails}) => {
                      <>
                         {!item.hasOwnProperty('description') ? 
                                                   
-                          <View style={styles.viewItem}>
+                        <View style={styles.viewItem}>
                             <Text style={{ ...styles.itemDetails }}>
-                              {item.date}
+                                {item.date}
                             </Text>
                             <Text style={styles.itemDetails}>£{item.cost}</Text>
-                          </View>
+                        </View>
                          :
-                         <> 
-                            <Text style={styles.itemDetails}>{item.date}</Text>
-                          <View style={styles.viewItem}>
+                        <> 
+                        <Text style={styles.itemDetails}>{item.date}</Text>
+                        <View style={styles.viewItem}>
                             <Text style={styles.itemDetails}>
-                              {item.description}
+                                {item.description}
                             </Text>
                             <Text style={styles.itemDetails}>
-                              £{item.cost}
+                                £{item.cost}
                             </Text>
-                          </View>
+                        </View>
                         </>
                     }
                       </>
@@ -92,8 +92,8 @@ export const ViewDetails = ({selectedJob,details,setDetails}) => {
                 );
             })}
             <View style={styles.button}>
-            <Button title="Back" onPress={() => {setDetails(null)}} />
-                </View>
+                <Button title="Back" onPress={() => {setDetails(null)}} />
+            </View>
             </ScrollView>
     )
 }
