@@ -51,6 +51,16 @@ export const styles = StyleSheet.create({
       justifyContent: "space-around",
       width: "100%",
     },
+    button:{
+      alignItems: 'center',
+      borderWidth: 2,
+      borderRadius: 5,
+      borderColor:'red',
+      paddingLeft:5,
+      paddingRight:5,
+      width: "fit-content",
+    },
+
     item:{
       
       justifyContent: 'space-between',
@@ -80,12 +90,15 @@ export const styles = StyleSheet.create({
     },
     viewItem:{
         flexDirection:'row',
-        margin: 0,
+        margin: 5,
         fontSize: 18,
         color: 'black',
         justifyContent: "space-between",
         width: "100%",
         borderBottomColor: "red",
         borderBottomWidth: 1,
+      },
+      linear:{
+        flexDirection:'row',
       }
   });

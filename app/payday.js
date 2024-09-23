@@ -1,4 +1,4 @@
-import { Text, View,Button, ScrollView } from "react-native";
+import { Text, View,Button, ScrollView, TextInput,Pressable } from "react-native";
 import { styles } from "./payday_components/styles";
 import { WorkerList } from "./workers_components/workerList";
 
@@ -16,6 +16,7 @@ const [jobs,setJobs]=useState([]);
 const [paydays,setPaydays]=useState([]);
 const [paid,setPaid]=useState(0); 
 const [owed,setOwed]=useState(0);
+const [amount,setAmount]=useState(0);
 
 useEffect(()=>{
 
@@ -58,7 +59,10 @@ useEffect(()=>{
     const [totalPaid,totalOwed]=calculateWages(selectedWorker,jobs);
     setPaid(totalPaid);
     setOwed(totalOwed);
+    setPaydays(selectedWorker.paydays || []);
     }
+
+
   },[selectedWorker,jobs]);
 
   const calculateWages = (worker,jobs) => {
@@ -132,18 +136,60 @@ jobs.forEach((job)=>{
   {selectedWorker && (
     <>    
     <View style={styles.viewItem}>
-      <Text style={styles.itemDetails}>{selectedWorker.name}</Text>
+      <Text style={styles.header}>{selectedWorker.name}</Text>
       <Text style={styles.itemDetails}>Rate: £{selectedWorker.rate}/day</Text>
     </View>
-    <Text style={styles.header}>Pay the fucker</Text>
+
+    <View style={{...styles.viewItem,borderBottomWidth:0,width:'50%',justifyContent:'flex-start'}}>
+
+      <Text style={styles.header}>Pay {selectedWorker.name}    </Text>
+
+        <View style={styles.linear}>
+          <Text style={{fontSize:20}}>£</Text>
+          <TextInput
+          style={{...styles.textInput,width:'60%'}}
+          placeholder="Amount"
+          onChangeText={(text) => setAmount(text)}
+          keyboardType="numeric"
+          />
+        </View>
+
+        <Pressable style={styles.button} onPress={() => {
+          payWorker(selectedWorker,amount);
+        }}>
+          <Text style={{width:'100%',fontSize:18,color:'red'}}>Pay {selectedWorker.name}</Text>
+        </Pressable>
+    </View>
     <View style={styles.viewItem}>
       <Text style={styles.itemDetails}>
-        Paid:{paid}
+        Total Paid:{paid}
       </Text>
       <Text style={styles.itemDetails}>
         Owed:{owed}
       </Text>
     </View>
+    <ScrollView>
+      <Text style={styles.header}>Payment History</Text>
+      {paydays.length>0 ? paydays.map((payday)=>{
+        return(
+          <View style={styles.viewItem}>
+            <Text style={styles.item}>
+              date:{payday.date} 
+            </Text>
+            <Text style={styles.item}>
+              amount:{payday.amount}
+            </Text>
+            </View>
+        )
+      })
+    :
+    <>
+    <Text style={styles.item}>
+      No Payment History
+      </Text>
+      </>
+}
+    </ScrollView>
     </>
 
   )}
