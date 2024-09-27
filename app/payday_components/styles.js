@@ -93,7 +93,7 @@ export const styles = StyleSheet.create({
         margin: 5,
         fontSize: 18,
         color: 'black',
-        justifyContent: "space-between",
+        justifyContent: "space-around",
         width: "100%",
         borderBottomColor: "red",
         borderBottomWidth: 1,

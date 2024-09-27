@@ -52,7 +52,6 @@ export const styles = StyleSheet.create({
       width: "100%",
     },
     item:{
-      
       justifyContent: 'space-between',
       flexDirection: 'column',
       marginBottom:20,

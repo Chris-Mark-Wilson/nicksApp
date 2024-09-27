@@ -1,4 +1,4 @@
-import { Text, View,Button, ScrollView, TextInput,Pressable } from "react-native";
+import { Text, View,Button, ScrollView, TextInput,Pressable, Alert } from "react-native";
 import { styles } from "./payday_components/styles";
 import { WorkerList } from "./workers_components/workerList";
 
@@ -50,7 +50,7 @@ useEffect(()=>{
     })
   }
   
-  },[]);
+  },[paydays]);
 
   useEffect(()=>{
     // work out the total paid and total owed for the selected worker
@@ -58,16 +58,22 @@ useEffect(()=>{
       console.log('calculating wages',selectedWorker,jobs);
     const [totalPaid,totalOwed]=calculateWages(selectedWorker,jobs);
     setPaid(totalPaid);
-    setOwed(totalOwed);
-    setPaydays(selectedWorker.paydays || []);
+    setOwed(totalOwed-totalPaid);
+    setPaydays(selectedWorker.paydays.sort((a,b)=>{
+      //sort paydays by date descending
+      if(a.date>b.date){
+        return -1;
+      }
+    }) || []);
     }
 
 
-  },[selectedWorker,jobs]);
+  },[selectedWorker,jobs,paydays]);
 
   const calculateWages = (worker,jobs) => {
     const totalWorked=getTotalWorked(worker,jobs);//total of cash amount worker has worked based on his rate FOR THAT JOB!
     const totalPaid=getTotalPaid(worker);//total of cash amount worker has been paid from all payments ever made to them
+    console.log('worker',worker);
     console.log('paid',totalPaid);
     console.log('worked',totalWorked);  
     return [totalPaid,totalWorked];
@@ -108,12 +114,76 @@ jobs.forEach((job)=>{
     //return total
     if(worker.paydays){
       worker.paydays.forEach((payday)=>{
-        if(payday.date<=date){
+     
           total+=payday.amount;
-        }
+       
       });
     }
     return total;
+  }
+
+  const payWorker= async (worker,amount)=>{
+    if(amount <=0){
+      Alert.alert('Amount must be greater than 0');
+      return;
+    }
+    console.log(worker,amount);
+    const newPayday={date: date.toDateString(), amount: +amount};
+    if(worker.paydays){
+      worker.paydays.push(newPayday);
+  } else {
+    worker.paydays=[newPayday];
+  }
+   // replace worker in workers with new worker
+    const newWorkers=workers.map((w)=>{
+      if(w.name===worker.name){
+        return worker;
+      }
+      return w;
+    });
+    await AsyncStorage.setItem('workers',JSON.stringify(newWorkers));
+    setWorkers(newWorkers);
+    Alert.alert(`Payment made - £${amount}`);
+    setPaid((prev)=>prev+ +amount);
+    setOwed((prev)=>prev- +amount);
+   
+  }
+
+  const deleteEntry= (worker,index,paydaysArray)=>{
+    //remove payday from worker.paydays in storage
+    Alert.alert("Are you sure you want to delete this entry?", null, [
+      {
+        text: "Cancel",
+        onPress: () => {
+          return;
+        },
+        style: "cancel",
+      },
+      {
+        text: "Delete Entry",
+        onPress: () => {
+          deletePayday(worker, index, paydaysArray);
+        },
+      },
+    ]);
+  }
+
+const deletePayday= async (worker,index,paydaysArray)=>{
+    const newPaydays=worker.paydays.filter((payday,i)=>{
+      return i!==index;
+    });
+    worker.paydays=newPaydays;
+    //replace worker in workers with new worker
+    const newWorkers=workers.map((w)=>{
+      if(w.name===worker.name){
+        return worker;
+      }
+      return w;
+    });
+    setPaid(getTotalPaid(worker));
+    await AsyncStorage.setItem('workers',JSON.stringify(newWorkers));
+    setPaydays(newPaydays);
+    Alert.alert('Entry Deleted');
   }
 
 
@@ -170,16 +240,19 @@ jobs.forEach((job)=>{
     </View>
     <ScrollView>
       <Text style={styles.header}>Payment History</Text>
-      {paydays.length>0 ? paydays.map((payday)=>{
+      {paydays.length>0 
+      ? paydays.map((payday,index,array)=>{
         return(
-          <View style={styles.viewItem}>
-            <Text style={styles.item}>
-              date:{payday.date} 
+          <Pressable style={styles.viewItem} key={index} onPress={()=>{
+         deleteEntry(selectedWorker,index,array);
+          }}>
+            <Text style={styles.itemDetails} >
+            {payday.date} 
             </Text>
-            <Text style={styles.item}>
-              amount:{payday.amount}
+            <Text style={styles.itemDetails}>
+              £{payday.amount}
             </Text>
-            </View>
+          </Pressable>
         )
       })
     :
