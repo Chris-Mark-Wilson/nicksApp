@@ -11,7 +11,7 @@ const navigation = useNavigation();
 
 const [date,setDate]=useState(new Date());
 const [workers,setWorkers]=useState([]);
-const [selectedWorker,setSelectedWorker]=useState(null);  
+const [selectedWorker,setSelectedWorker]=useState({});  
 const [jobs,setJobs]=useState([]);
 const [paydays,setPaydays]=useState([]);
 const [paid,setPaid]=useState(0); 
@@ -56,15 +56,19 @@ useEffect(()=>{
     // work out the total paid and total owed for the selected worker
     if(selectedWorker && jobs.length>0){
       console.log('calculating wages',selectedWorker,jobs);
-    const [totalPaid,totalOwed]=calculateWages(selectedWorker,jobs);
+    const wageArray=calculateWages(selectedWorker,jobs);
+    const totalPaid=wageArray[0];
+    const totalOwed=wageArray[1];
     setPaid(totalPaid);
     setOwed(totalOwed-totalPaid);
-    setPaydays(selectedWorker.paydays.sort((a,b)=>{
-      //sort paydays by date descending
-      if(a.date>b.date){
-        return -1;
-      }
-    }) || []);
+    if(selectedWorker.paydays){
+      setPaydays(selectedWorker.paydays.sort((a,b)=>{
+        //sort paydays by date descending
+        if(a.date>b.date){
+          return -1;
+        }
+      }) || []);
+    }
     }
 
 
