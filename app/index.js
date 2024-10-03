@@ -12,7 +12,7 @@ export default function Index() {
     console.log("resetting database");
     Alert.alert(
       "Reset Database",
-      "Are you sure you want to reset the database?",
+      "Are you sure you want to reset the database?\n This will delete all data, everything will be lost \n forever...",
       [
         {
           text: "Yes!!",
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         border: '1px solid red',
         
       flex: 1,
-      backgroundColor: '#fff',
+      backgroundColor: "#d4d4d4",
       alignItems: 'center',
       justifyContent: 'space-around',
     

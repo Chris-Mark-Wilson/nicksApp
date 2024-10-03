@@ -2,8 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-      borderColor: "red",
-      borderWidth: 5,
+     
       flex: 1,
       backgroundColor: "#fff",
       alignItems: "center",
@@ -16,10 +15,11 @@ export const styles = StyleSheet.create({
       color: "blue",
     },
     workerList: {
-      borderColor: "red",
-      borderWidth: 5,
+      borderColor: "black",
+      borderWidth: 1,
+      borderRadius: 5,
       flex: 1,
-      backgroundColor: "lightblue",
+      backgroundColor: "#d4d4d4",
       padding: 10,
       width: "100%",
     },
@@ -40,13 +40,13 @@ export const styles = StyleSheet.create({
       flex:1,
       width:'100%',
     padding:10,
-      backgroundColor: "lightblue",
+    backgroundColor: "#d4d4d4",
     },
     buttons: {
       borderColor: "blue",
-      borderWidth: 5,
+      borderWidth: 2,
       flex: 0.3,
-      backgroundColor: "lightgreen",
+      backgroundColor: "#d4d4d4",
       padding: 10,
       justifyContent: "space-around",
       width: "100%",

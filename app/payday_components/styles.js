@@ -2,13 +2,12 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     container: {
-      borderColor: "red",
-      borderWidth: 5,
+  
       flex: 1,
       backgroundColor: "#fff",
       alignItems: "center",
       justifyContent: "space-between",
-  
+      backgroundColor: "#d4d4d4",
 
     },
     header: {
@@ -16,10 +15,9 @@ export const styles = StyleSheet.create({
       color: "blue",
     },
     workerList: {
-      borderColor: "red",
-      borderWidth: 5,
+    
       flex: 1,
-      backgroundColor: "lightblue",
+      backgroundColor: "#d4d4d4",
       padding: 10,
       width: "100%",
     },
@@ -40,7 +38,7 @@ export const styles = StyleSheet.create({
       flex:1,
       width:'100%',
     padding:10,
-      backgroundColor: "lightblue",
+
     },
     buttons: {
       borderColor: "blue",
