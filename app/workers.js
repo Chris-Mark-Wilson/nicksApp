@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View,ScrollView,TextInput,SafeAreaView,Alert } from 'react-native';
+import {  StyleSheet, View} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Pressable} from 'react-native';
+
 import { useState,useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { WorkerList } from './workers_components/workerList';
@@ -85,10 +85,9 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: {
-    borderColor: "red",
-    borderWidth: 5,
+ 
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#d4d4d4",
     alignItems: "center",
     justifyContent: "space-between",
 

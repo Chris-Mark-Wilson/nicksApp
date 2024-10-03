@@ -2,13 +2,13 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
     container: {
-      borderColor: "red",
-      borderWidth: 5,
+     
+    
       flex: 1,
       backgroundColor: "#fff",
       alignItems: "center",
       justifyContent: "space-between",
-  
+      backgroundColor: "#d4d4d4",
     
     },
     header: {
@@ -16,10 +16,9 @@ export const styles = StyleSheet.create({
       color: "blue",
     },
     customerList: {
-      borderColor: "red",
-      borderWidth: 5,
+  
       flex: 1,
-      backgroundColor: "lightblue",
+      backgroundColor: "#d4d4d4",
   
       padding: 20,
   
@@ -39,18 +38,18 @@ export const styles = StyleSheet.create({
     },
     customerDetails:{
       borderColor: "blue",
-      borderWidth: 2,
+      borderWidth: 1,
       flex:1,
     padding:10,
       width:'100%',
       // alignItems:'center',
-      backgroundColor: "lightblue",
+      backgroundColor: "#d4d4d4",
     },
     buttons: {
       borderColor: "blue",
-      borderWidth: 5,
+      borderWidth: 2,
       flex: 0.4,
-      backgroundColor: "lightgreen",
+      backgroundColor: "#d4d4d4",
       padding: 10,
       justifyContent: "space-around",
   

@@ -1,4 +1,4 @@
-import { Text, View,Button, ScrollView, TextInput,Pressable, Alert } from "react-native";
+import { Text, View,Button, ScrollView, TextInput,Pressable, Alert,Keyboard } from "react-native";
 import { styles } from "./payday_components/styles";
 import { WorkerList } from "./workers_components/workerList";
 
@@ -9,6 +9,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default Invoices = () => {
 const navigation = useNavigation();
 
+useEffect(() => {
+  const keyboardShowListener = Keyboard.addListener("keyboardDidShow", () => {
+    setIsKeyboard(true);
+  });
+  const keyboardHideListener = Keyboard.addListener("keyboardDidHide", () => {
+    setIsKeyboard(false);
+  });
+
+  return () => {
+    keyboardShowListener.remove();
+    keyboardHideListener.remove();
+  };
+}, []);
+
 const [date,setDate]=useState(new Date());
 const [workers,setWorkers]=useState([]);
 const [selectedWorker,setSelectedWorker]=useState({});  
@@ -17,6 +31,7 @@ const [paydays,setPaydays]=useState([]);
 const [paid,setPaid]=useState(0); 
 const [owed,setOwed]=useState(0);
 const [amount,setAmount]=useState(0);
+const [isKeyboard,setIsKeyboard]=useState(false);
 
 useEffect(()=>{
 
@@ -196,7 +211,7 @@ const deletePayday= async (worker,index,paydaysArray)=>{
     <View style={styles.container}>
       <ScrollView style={styles.workerList}>
 
-        <Text style={styles.header}>Payday</Text>
+        <Text style={styles.header}>Select worker</Text>
 
         <WorkerList
           setSelectedWorker={setSelectedWorker}
@@ -207,7 +222,7 @@ const deletePayday= async (worker,index,paydaysArray)=>{
 
 </ScrollView>
 <View style={styles.workerList}>
-  {selectedWorker && (
+  {selectedWorker.name && (
     <>    
     <View style={styles.viewItem}>
       <Text style={styles.header}>{selectedWorker.name}</Text>
@@ -216,7 +231,7 @@ const deletePayday= async (worker,index,paydaysArray)=>{
 
     <View style={{...styles.viewItem,borderBottomWidth:0,width:'50%',justifyContent:'flex-start'}}>
 
-      <Text style={styles.header}>Pay {selectedWorker.name}    </Text>
+      <Text style={styles.header}>Make Payment </Text>
 
         <View style={styles.linear}>
           <Text style={{fontSize:20}}>£</Text>
@@ -231,7 +246,7 @@ const deletePayday= async (worker,index,paydaysArray)=>{
         <Pressable style={styles.button} onPress={() => {
           payWorker(selectedWorker,amount);
         }}>
-          <Text style={{width:'100%',fontSize:18,color:'red'}}>Pay {selectedWorker.name}</Text>
+          <Text style={{width:'100%',fontSize:18,color:'red'}}>Pay</Text>
         </Pressable>
     </View>
     <View style={styles.viewItem}>
@@ -271,12 +286,15 @@ const deletePayday= async (worker,index,paydaysArray)=>{
 
   )}
 </View>
-        <Button
-          color="blue"
-          title="Home"
+        {!isKeyboard && <Pressable style={{...styles.button,width:'60%'}}
+        
           onPress={() => navigation.navigate("index")}
-        />
+        >
+        <Text style={{width:'100%',fontSize:18,color:'red',textAlign:'center'}}>Back</Text>
+        </Pressable>
+      }
     </View>
+       
   );
 }
 
